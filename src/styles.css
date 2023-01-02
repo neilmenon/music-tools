@@ -1,4 +1,16 @@
 /* You can add global styles to this file, and also import other style files */
+@import "~@angular/material/prebuilt-themes/pink-bluegrey.css";
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+body {
+    margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif;
+    height: 100%;
+    background-image: url(/assets/img/background.svg);
+    background-color: #222222;
+    color: #e2e2e2;
+    width: 85%;
+    margin: auto;
+}
+
+.mat-mdc-button .mdc-button__label, .mat-mdc-unelevated-button .mdc-button__label, .mat-mdc-raised-button .mdc-button__label, .mat-mdc-outlined-button .mdc-button__label {
+    color: #222222;
+}
