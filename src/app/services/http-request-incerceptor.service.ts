@@ -4,6 +4,8 @@ import { catchError, from, lastValueFrom, Observable, switchMap, throwError } fr
 import * as moment from 'moment';
 import { LocalStorageService } from './local-storage.service';
 import { SpotifyService } from './spotify.service';
+import { MessageService } from './message.service';
+import { ErrorHandlerService } from './error-handler.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +15,9 @@ export class HttpRequestIncerceptorService implements HttpInterceptor {
 
   constructor(
     private localStorageService: LocalStorageService,
-    private spotifyService: SpotifyService
+    private spotifyService: SpotifyService,
+    private messageService: MessageService,
+    private errorHandlerService: ErrorHandlerService
   ) { }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
@@ -24,11 +28,11 @@ export class HttpRequestIncerceptorService implements HttpInterceptor {
     if (req.url.includes("api.spotify.com")) {
       req = req.clone({
         setHeaders: {
-          'Authorization': `Bearer ${this.localStorageService.getAuthDetails()?.data.access_token}`,
+          'Authorization': `Bearer ${this.localStorageService.getSpotifyAuthDetails()?.data.access_token}`,
         },
       })
       
-      if (moment().unix() >= this.localStorageService.getAuthDetails()?.expiresUnix) {
+      if (moment().unix() >= this.localStorageService.getSpotifyAuthDetails()?.expiresUnix) {
         // refresh token handling (preventative)
         await this.spotifyService.refreshToken()
       }
@@ -38,10 +42,14 @@ export class HttpRequestIncerceptorService implements HttpInterceptor {
       catchError(async (error) => {
         if (
           error instanceof HttpErrorResponse &&
-          req.url.includes("api.spotify.com") &&
-          error.status === 401
+          req.url.includes("api.spotify.com")
         ) {
-          return lastValueFrom(await this.handle401Error(req, next))
+          if (error.status === 401) {
+            return lastValueFrom(await this.handle401Error(req, next))
+          }
+
+          // handle error from the Spotify API
+          this.messageService.open("The Spotify API returned an error instead of data." + this.errorHandlerService.getHttpErrorMessage(error))
         }
 
         return lastValueFrom(throwError(() => error)) 
@@ -58,7 +66,7 @@ export class HttpRequestIncerceptorService implements HttpInterceptor {
       this.isRefreshing = false
       req = req.clone({
         setHeaders: {
-          'Authorization': `Bearer ${this.localStorageService.getAuthDetails()?.data.access_token}`,
+          'Authorization': `Bearer ${this.localStorageService.getSpotifyAuthDetails()?.data.access_token}`,
         },
       })
       return next.handle(req)

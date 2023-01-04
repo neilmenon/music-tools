@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { LocalStorageService } from 'src/app/services/local-storage.service';
 import { MessageService } from 'src/app/services/message.service';
 import { SpotifyService } from 'src/app/services/spotify.service';
 
@@ -9,10 +10,12 @@ import { SpotifyService } from 'src/app/services/spotify.service';
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit {
+  user: SpotifyApi.UserObjectPublic
 
   constructor(
     public spotifyService: SpotifyService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private localStorageService: LocalStorageService
   ) { }
 
   ngOnInit(): void {
@@ -23,6 +26,6 @@ export class HomeComponent implements OnInit {
       this.spotifyService.getAuthTokensFromCode(params['code'])
     }
 
-    // this.spotifyService.getUserDetails()
+    this.user = this.localStorageService.getSpotifyUserDetails()
   }
 }

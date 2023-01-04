@@ -1,2 +1,19 @@
-<button mat-raised-button color="accent" (click)="spotifyService.redirectToAuthorizationPage()">Login with Spotify</button>
-<button mat-raised-button color="accent" (click)="spotifyService.getUserDetails()">User </button>
+<div class="center-all page-container">
+    <h1 class="home-page-title">Neil's Music Tools</h1>
+    
+    <p>
+        Various apps that solve some small challenge or serve a simple purpose.
+        <br><br>
+        <app-connect-spotify></app-connect-spotify>
+    </p>
+
+    <div class="app-list-container container">
+        <div class="box">
+            <h1 [routerLink]="['spotify-album-sort']" class="clickable">Spotify Library Album Sort</h1>
+            <p>Provides some more ways to sort albums in your Spotify library which are not possible through the Spotify app.</p>
+            <p>
+                <button mat-raised-button color="accent" [routerLink]="['spotify-album-sort']">Launch</button>
+            </p>
+        </div>
+    </div>
+</div>

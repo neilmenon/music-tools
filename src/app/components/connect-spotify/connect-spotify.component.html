@@ -1,0 +1,6 @@
+<button mat-raised-button color="accent" *ngIf="!user" (click)="spotifyService.redirectToAuthorizationPage()" class="spotify-button">
+    Connect Spotify
+</button>
+<button mat-flat-button *ngIf="user" (click)="localStorageService.clearSpotifyUserData()">
+    Disconnect {{ localStorageService.getSpotifyUserDetails()?.display_name }}
+</button>

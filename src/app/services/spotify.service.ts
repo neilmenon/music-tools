@@ -1,8 +1,9 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, lastValueFrom, throwError } from 'rxjs';
+import { Router } from '@angular/router';
+import { catchError, delay, lastValueFrom, throwError } from 'rxjs';
 import { config } from '../config/config';
-import { SpotifyAuthModel } from '../models/localStorageModel';
+import { SpotifyAuthModel, SpotifyLocalAlbumModel } from '../models/localStorageModel';
 import { SpotifyApiTokenModel } from '../models/spotifyApiModel';
 import { ErrorHandlerService } from './error-handler.service';
 import { LocalStorageService } from './local-storage.service';
@@ -17,8 +18,13 @@ export class SpotifyService {
     private http: HttpClient,
     private messageService: MessageService,
     private errorService: ErrorHandlerService,
-    private localStorageService: LocalStorageService
+    private localStorageService: LocalStorageService,
+    private router: Router
   ) { }
+
+  isAuthenticated(): boolean {
+    return this.localStorageService.getSpotifyAuthDetails() ? true : false
+  }
 
   redirectToAuthorizationPage() {
     let authParameters = {
@@ -40,18 +46,34 @@ export class SpotifyService {
         })
         )
       )
+    
+    // persist auth details
     let authDetails: SpotifyAuthModel = new SpotifyAuthModel()
     authDetails.data = authResponse
-    this.localStorageService.setAuthDetails(authDetails)
-    window.location.href = ""
+    this.localStorageService.setSpotifyAuthDetails(authDetails)
+
+    this.router.navigate([], {
+      queryParams: { 'code': null },
+      queryParamsHandling: 'merge'
+    })
+    
+    // fetch + persist user + saved albums object
+    this.messageService.open("Fetching Spotify user details...", "center", true)
+    await this.getSpotifyUserDetails()
+    this.messageService.open("Fetching albums saved in your Spotify library...", "center", true)
+    await this.getUserAlbums()
+    this.messageService.open("Fetch complete.")
+
   }
 
-  getUserDetails() {
-    lastValueFrom(this.http.get("https://api.spotify.com/v1/me"))
+  async getSpotifyUserDetails(): Promise<SpotifyApi.UserObjectPublic> {
+    let userResponse: SpotifyApi.UserObjectPublic = await lastValueFrom(this.http.get<SpotifyApi.UserObjectPublic>("https://api.spotify.com/v1/me"))
+
+    return this.localStorageService.setSpotifyUserDetails(userResponse)
   }
 
   async refreshToken() {
-    let authDetails = JSON.parse(JSON.stringify(this.localStorageService.getAuthDetails()))
+    let authDetails = JSON.parse(JSON.stringify(this.localStorageService.getSpotifyAuthDetails()))
     let data = new FormData()
     data.append("refresh_token", authDetails.data.refresh_token)
     let refreshResponse: SpotifyApiTokenModel = await lastValueFrom(
@@ -65,6 +87,26 @@ export class SpotifyService {
     
     refreshResponse.refresh_token = authDetails.data.refresh_token
     authDetails.data = refreshResponse
-    this.localStorageService.setAuthDetails(authDetails)
+    this.localStorageService.setSpotifyAuthDetails(authDetails)
+  }
+
+  async getUserAlbums(): Promise<SpotifyLocalAlbumModel> {
+    let albums: SpotifyApi.SavedAlbumObject[] = []
+
+    let albumResponse: SpotifyApi.UsersSavedAlbumsResponse = await lastValueFrom(this.http.get<SpotifyApi.UsersSavedAlbumsResponse>("https://api.spotify.com/v1/me/albums?limit=50"))
+    albums = albumResponse.items
+    
+    while (albumResponse.next) {
+      albumResponse = await lastValueFrom(this.http.get<SpotifyApi.UsersSavedAlbumsResponse>(albumResponse.next).pipe(delay(500)))
+      albums = [...albums, ...albumResponse.items]
+    }
+
+    // strip extra data in object which is not needed (for now)
+    albums.forEach(x => {
+      x.album.available_markets = []
+      x.album.tracks.items = []
+    })
+
+    return this.localStorageService.setSpotifySavedAlbums(albums)
   }
 }

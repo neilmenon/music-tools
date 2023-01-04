@@ -1,0 +1,15 @@
+
+
+<div class="center-all page-container">
+    <h1 class="page-title">Spotify Library Album Sort</h1>
+    <p>
+        Provides some more ways to sort albums in your Spotify library which are not possible through the Spotify app.<br><br>
+        <app-connect-spotify></app-connect-spotify>
+    </p>
+
+    <div *ngIf="user && albums" class="container">
+        <div *ngFor="let album of albums">
+            {{ album.album.name }}
+        </div>
+    </div>
+</div>

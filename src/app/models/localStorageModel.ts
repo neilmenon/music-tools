@@ -5,3 +5,8 @@ export class SpotifyAuthModel {
     expiresUnix: number
     data: SpotifyApiTokenModel
 }
+
+export class SpotifyLocalAlbumModel {
+    fetchedDate: string
+    data: SpotifyApi.SavedAlbumObject[]
+}
