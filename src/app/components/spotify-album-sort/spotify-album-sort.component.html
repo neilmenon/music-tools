@@ -7,9 +7,22 @@
         <app-connect-spotify></app-connect-spotify>
     </p>
 
-    <div *ngIf="user && albums" class="container">
-        <div *ngFor="let album of albums">
-            {{ album.album.name }}
+    <div class="album-sort-options">
+        <mat-chip-option *ngFor="let option of sortOptions" [selected]="sortKey == option" color="accent" (click)="sortKey = option; sortDesc = !sortDesc" [selectable]="false">
+            <mat-icon *ngIf="sortKey == option" class="sort-icon">{{ sortDesc ? 'arrow_downward' : 'arrow_upward' }}</mat-icon>
+            {{ option }}
+        </mat-chip-option>
+    </div>
+    <div *ngIf="user && albums" [ngClass]="!mobileView() ? 'album-container' : 'album-container-mobile'">
+        <div *ngFor="let album of albums | albumSort:sortKey:sortDesc" [ngClass]="!mobileView() ? 'album-card' : 'album-card-mobile'">
+            <a href="{{ album.album.external_urls.spotify }}" target="_blank">
+                <img src="{{ extractAlbumImage(album.album.images) }}">
+            </a>
+            <div class="text-ellipsis">
+                <div class="text-ellipsis"><strong>{{ album.album.name }}</strong></div>
+                <span>{{ formatArtists(album.album.artists) }}</span><br>
+                <mat-chip class="mat-chip-compact" style="margin-top: 0.4rem">{{ getSortDisplayValue(album) }}</mat-chip>
+            </div>
         </div>
     </div>
 </div>

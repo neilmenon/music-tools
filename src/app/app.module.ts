@@ -14,13 +14,17 @@ import { HttpRequestIncerceptorService } from './services/http-request-incercept
 import { MatChipsModule } from '@angular/material/chips';
 import { ConnectSpotifyComponent } from './components/connect-spotify/connect-spotify.component';
 import { SpotifyAlbumSortComponent } from './components/spotify-album-sort/spotify-album-sort.component';
+import { AlbumSortPipe } from './pipes/album-sort.pipe';
+import { MatIconModule } from '@angular/material/icon';
+
 
 @NgModule({
   declarations: [
     AppComponent,
     HomeComponent,
     ConnectSpotifyComponent,
-    SpotifyAlbumSortComponent
+    SpotifyAlbumSortComponent,
+    AlbumSortPipe
   ],
   imports: [
     BrowserModule,
@@ -35,7 +39,8 @@ import { SpotifyAlbumSortComponent } from './components/spotify-album-sort/spoti
     }),
     HttpClientModule,
     MatSnackBarModule,
-    MatChipsModule
+    MatChipsModule,
+    MatIconModule
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: HttpRequestIncerceptorService, multi: true }
