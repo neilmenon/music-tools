@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, delay, lastValueFrom, throwError } from 'rxjs';
 import { config } from '../config/config';
-import { SpotifyAuthModel, SpotifyLocalAlbumModel } from '../models/localStorageModel';
+import { SpotifyAlbumEntryModel, SpotifyAuthModel, SpotifyCustomAlbumPropModel, SpotifyLocalAlbumModel } from '../models/localStorageModel';
 import { SpotifyApiTokenModel } from '../models/spotifyApiModel';
 import { ErrorHandlerService } from './error-handler.service';
 import { LocalStorageService } from './local-storage.service';
@@ -101,12 +101,28 @@ export class SpotifyService {
       albums = [...albums, ...albumResponse.items]
     }
 
-    // strip extra data in object which is not needed (for now)
-    albums.forEach(x => {
+    let albumArray: SpotifyAlbumEntryModel[] = []
+    albums.forEach(async x => {
+      let customProperties: SpotifyCustomAlbumPropModel = new SpotifyCustomAlbumPropModel()
+      
+      // make sure all tracks have been fetched first (if more than 50)
+      let trackResponse = x.album.tracks
+      let tracks: SpotifyApi.TrackObjectSimplified[] = x.album.tracks.items
+      while (trackResponse.next) {
+        trackResponse = await lastValueFrom(this.http.get<SpotifyApi.AlbumTracksResponse>(trackResponse.next).pipe(delay(500)))
+        tracks = [...tracks, ...trackResponse.items]
+      }
+
+      // map custom/calculated properties
+      customProperties.duration = x.album.tracks.items.map(x => x.duration_ms).reduce((a, b) => a + b, 0)
+
+      // strip extra data in object which is not needed (for now)
       x.album.available_markets = []
       x.album.tracks.items = []
+
+      albumArray.push({ api: x, custom: customProperties })
     })
 
-    return this.localStorageService.setSpotifySavedAlbums(albums)
+    return this.localStorageService.setSpotifySavedAlbums(albumArray)
   }
 }

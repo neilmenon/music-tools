@@ -8,20 +8,21 @@
     </p>
 
     <div class="album-sort-options">
-        <mat-chip-option *ngFor="let option of sortOptions" [selected]="sortKey == option" color="accent" (click)="sortKey = option; sortDesc = !sortDesc" [selectable]="false">
+        <mat-chip-option *ngFor="let option of sortOptions" [selected]="sortKey == option" color="accent" (click)="sortKey == option ? sortDesc = !sortDesc : null; sortKey = option; " [selectable]="false">
             <mat-icon *ngIf="sortKey == option" class="sort-icon">{{ sortDesc ? 'arrow_downward' : 'arrow_upward' }}</mat-icon>
             {{ option }}
         </mat-chip-option>
+        <p>{{ getSortDescription(sortKey) }}</p>
     </div>
     <div *ngIf="user && albums" [ngClass]="!mobileView() ? 'album-container' : 'album-container-mobile'">
-        <div *ngFor="let album of albums | albumSort:sortKey:sortDesc" [ngClass]="!mobileView() ? 'album-card' : 'album-card-mobile'">
-            <a href="{{ album.album.external_urls.spotify }}" target="_blank">
-                <img src="{{ extractAlbumImage(album.album.images) }}">
+        <div *ngFor="let entry of albums | albumSort:sortKey:sortDesc" [ngClass]="!mobileView() ? 'album-card' : 'album-card-mobile'">
+            <a href="{{ entry.api.album.external_urls.spotify }}" target="_blank">
+                <img src="{{ extractAlbumImage(entry.api.album.images) }}">
             </a>
             <div class="text-ellipsis">
-                <div class="text-ellipsis"><strong>{{ album.album.name }}</strong></div>
-                <span>{{ formatArtists(album.album.artists) }}</span><br>
-                <mat-chip class="mat-chip-compact" style="margin-top: 0.4rem">{{ getSortDisplayValue(album) }}</mat-chip>
+                <div class="text-ellipsis" matTooltip="{{ entry.api.album.name }}" matTooltipPosition="above"><strong>{{ entry.api.album.name }}</strong></div>
+                <span>{{ formatArtists(entry.api.album.artists) }}</span><br>
+                <mat-chip class="mat-chip-compact" style="margin-top: 0.4rem">{{ getSortDisplayValue(entry) }}</mat-chip>
             </div>
         </div>
     </div>

@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { SPOTIFY_ALBUM_LOCAL, SPOTIFY_AUTH_LOCAL, SPOTIFY_USER_LOCAL } from '../constants/localStorageConstants';
-import { SpotifyAuthModel, SpotifyLocalAlbumModel } from '../models/localStorageModel';
+import { SpotifyAlbumEntryModel, SpotifyAuthModel, SpotifyLocalAlbumModel } from '../models/localStorageModel';
 import * as moment from 'moment';
 import { MessageService } from './message.service';
 
@@ -38,7 +38,7 @@ export class LocalStorageService {
     return JSON.parse(localStorage.getItem(SPOTIFY_ALBUM_LOCAL))
   }
 
-  setSpotifySavedAlbums(albums: SpotifyApi.SavedAlbumObject[]): SpotifyLocalAlbumModel {
+  setSpotifySavedAlbums(albums: SpotifyAlbumEntryModel[]): SpotifyLocalAlbumModel {
     let spotifyLocalModel = new SpotifyLocalAlbumModel()
     spotifyLocalModel.fetchedDate = moment().format()
     spotifyLocalModel.data = albums

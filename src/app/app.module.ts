@@ -16,6 +16,9 @@ import { ConnectSpotifyComponent } from './components/connect-spotify/connect-sp
 import { SpotifyAlbumSortComponent } from './components/spotify-album-sort/spotify-album-sort.component';
 import { AlbumSortPipe } from './pipes/album-sort.pipe';
 import { MatIconModule } from '@angular/material/icon';
+import { PluralizePipe } from './pipes/pluralize.pipe';
+import { MatTooltipModule } from '@angular/material/tooltip';
+
 
 
 @NgModule({
@@ -24,7 +27,8 @@ import { MatIconModule } from '@angular/material/icon';
     HomeComponent,
     ConnectSpotifyComponent,
     SpotifyAlbumSortComponent,
-    AlbumSortPipe
+    AlbumSortPipe,
+    PluralizePipe
   ],
   imports: [
     BrowserModule,
@@ -40,7 +44,8 @@ import { MatIconModule } from '@angular/material/icon';
     HttpClientModule,
     MatSnackBarModule,
     MatChipsModule,
-    MatIconModule
+    MatIconModule,
+    MatTooltipModule
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: HttpRequestIncerceptorService, multi: true }

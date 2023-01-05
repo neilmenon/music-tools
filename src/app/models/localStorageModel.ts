@@ -8,5 +8,18 @@ export class SpotifyAuthModel {
 
 export class SpotifyLocalAlbumModel {
     fetchedDate: string
-    data: SpotifyApi.SavedAlbumObject[]
+    data: SpotifyAlbumEntryModel[]
+}
+
+export class SpotifyAlbumEntryModel {
+    api: SpotifyApi.SavedAlbumObject
+    custom: SpotifyCustomAlbumPropModel
+}
+
+export class SpotifyCustomAlbumPropModel {
+    duration: number
+
+    constructor() {
+        this.duration = 0
+    }
 }
