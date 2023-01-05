@@ -25,6 +25,8 @@ export class SpotifyAlbumSortComponent {
   sortDesc: boolean = true
   sortOptions = albumSortOptions
 
+  albums: SpotifyAlbumEntryModel[] = []
+
   constructor(
     private localStorageService: LocalStorageService
   ) {
@@ -48,14 +50,12 @@ export class SpotifyAlbumSortComponent {
         yy: '%dY'
       }
     });
+
+    this.albums = this.localStorageService.getSpotifySavedAlbums() ? this.localStorageService.getSpotifySavedAlbums().data : []
   }
 
   get user(): SpotifyApi.UserObjectPublic { 
     return this.localStorageService.getSpotifyUserDetails()
-  }
-
-  get albums(): SpotifyAlbumEntryModel[] { 
-    return this.localStorageService.getSpotifySavedAlbums()?.data
   }
 
   extractAlbumImage(images: SpotifyApi.ImageObject[]): string {
