@@ -1,0 +1,61 @@
+name: "CI for Neil's Music Tools"
+
+on:
+  push:
+    branches: [ master ]
+    paths-ignore:
+      - '.github/workflows/*'
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Pull, Build & Deploy
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16.17.1]
+
+    steps:
+      - uses: actions/checkout@v2.4.0
+
+      - name: Cache node modules
+        uses: actions/cache@v2.1.7
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+            
+      - name: Setup Node.js v${{ matrix.node-version }} environment
+        uses: actions/setup-node@v2.5.0
+        with:
+          node-version: ${{ matrix.node-version }}
+          
+      - name: Create config.ts file
+        run: |
+          echo 'export const config = { spotify: { clientId: "${{ secrets.SPOTIFY_CLIENT_ID }}", authCodeUrl: "${{ secrets.AUTH_CODE_URL }}", redirectUri: "${{ secrets.SPOTIFY_REDIRECT_URI }}", scope: "${{ secrets.SPOTIFY_SCOPES }}", } }' > ./src/app/config/config.ts
+          
+      - name: npm install and ng build
+        run: |
+          npm i
+          npm run build:prod
+          
+      - name: Create and copy backend resources
+        run: |
+          mkdir ./dist/music-tools/resources
+          cp ./resources/spotify_auth.php ./dist/music-tools/resources/
+          echo '<?php return array( "client_id" => "${{ secrets.SPOTIFY_CLIENT_ID }}", "client_secret" => "${{ secrets.SPOTIFY_CLIENT_SECRET }}", "redirect_uri" => "${{ secrets.SPOTIFY_REDIRECT_URI }}", "prod" => true, ); ?>' > ./dist/music-tools/resources/app-config.php
+          
+      - name: Copy files to server web root
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: root
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          passphrase: ${{ secrets.PASSPHRASE }}
+          source: "./dist/music-tools/*"
+          target: "/usr/share/nginx/tools/"
+          overwrite: true
+          strip_components: 2
