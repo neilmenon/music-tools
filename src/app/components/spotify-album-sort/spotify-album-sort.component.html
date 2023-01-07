@@ -3,18 +3,19 @@
 <div class="center-all page-container">
     <h1 class="page-title">Spotify Library Album Sort</h1>
     <p>
-        Provides some more ways to sort albums in your Spotify library which are not possible through the Spotify app.<br>
+        Provides some more ways to sort albums in your Spotify library which are not possible through the Spotify app.
+        <a routerLink="">Back to App List</a><br>
     </p>
     <p><app-connect-spotify></app-connect-spotify></p>
 
     <div *ngIf="user && albums">
-        <div class="album-sort-options">
+        <div class="album-sort-options no-scrollbar-container">
             <mat-chip-option *ngFor="let option of sortOptions" [selected]="sortKey == option" color="accent" (click)="sortKey == option ? sortDesc = !sortDesc : null; sortKey = option; " [selectable]="false">
                 <mat-icon *ngIf="sortKey == option" class="sort-icon">{{ sortDesc ? 'arrow_downward' : 'arrow_upward' }}</mat-icon>
                 {{ option }}
             </mat-chip-option>
-            <p>{{ getSortDescription(sortKey) }}</p>
         </div>
+        <p>{{ getSortDescription() }}</p>
         <p *ngIf="albums.length == 0">Not seeing your library? I might still be fetching your albums. Once that's done, try reloading.</p>
         <div [ngClass]="!mobileView() ? 'album-container' : 'album-container-mobile'">
             <div *ngFor="let entry of albums | albumSort:sortKey:sortDesc" [ngClass]="!mobileView() ? 'album-card' : 'album-card-mobile'">

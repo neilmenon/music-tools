@@ -40,14 +40,14 @@ export class SpotifyAlbumSortComponent {
         ss: '%ds',
         m:  '1m',
         mm: '%dm',
-        h:  '1h',
-        hh: '%dh',
-        d:  '1d',
-        dd: '%dd',
-        M:  '1mo',
-        MM: '%dmo',
-        y:  '1y',
-        yy: '%dY'
+        h:  '1h ago',
+        hh: '%dh ago',
+        d:  '1d ago',
+        dd: '%dd ago',
+        M:  '1mo ago',
+        MM: '%dmo ago',
+        y:  '1y ago',
+        yy: '%dY ago'
       }
     });
 
@@ -81,9 +81,10 @@ export class SpotifyAlbumSortComponent {
     }
   }
 
-  getSortDescription(sortKey: AlbumSortKey): string {
+  getSortDescription(): string {
     switch(this.sortKey) { 
-      case "Popularity": return `Your Spotify library is ${ Math.round(this.albums.map(x => x.api.album.popularity).reduce((a, b) => a + b) / this.albums.length) }% mainstream.`
+      case "Popularity": return `Uses Spotify's score. Your Spotify library is ${ Math.round(this.albums.map(x => x.api.album.popularity).reduce((a, b) => a + b) / this.albums.length) }% mainstream.`
+      case "Anniversary": return "Shows when the next anniversary for the album is, so you can listen on that day!"
       default: return ""
     }
   }

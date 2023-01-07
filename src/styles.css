@@ -289,3 +289,15 @@ div > mat-chip-option:not(:last-child), mat-chip:not(:last-child) {
 .mat-chip-compact {
     height: 21px!important;
 }
+
+.no-scrollbar-container {
+    overflow-x: scroll;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+    white-space: nowrap;
+}
+
+.no-scrollbar-container::-webkit-scrollbar { /* WebKit */
+    width: 0;
+    height: 0;
+}
