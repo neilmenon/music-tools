@@ -1,8 +1,8 @@
 {
-  "name": "music-tools",
-  "short_name": "music-tools",
-  "theme_color": "#1976d2",
-  "background_color": "#fafafa",
+  "name": "Neil's Music Tools",
+  "short_name": "N.M.T.",
+  "theme_color": "#577a9c",
+  "background_color": "#212121",
   "display": "standalone",
   "scope": "./",
   "start_url": "./",

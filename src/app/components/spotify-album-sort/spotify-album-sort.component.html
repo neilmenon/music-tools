@@ -3,26 +3,29 @@
 <div class="center-all page-container">
     <h1 class="page-title">Spotify Library Album Sort</h1>
     <p>
-        Provides some more ways to sort albums in your Spotify library which are not possible through the Spotify app.<br><br>
-        <app-connect-spotify></app-connect-spotify>
+        Provides some more ways to sort albums in your Spotify library which are not possible through the Spotify app.<br>
     </p>
+    <p><app-connect-spotify></app-connect-spotify></p>
 
-    <div class="album-sort-options">
-        <mat-chip-option *ngFor="let option of sortOptions" [selected]="sortKey == option" color="accent" (click)="sortKey == option ? sortDesc = !sortDesc : null; sortKey = option; " [selectable]="false">
-            <mat-icon *ngIf="sortKey == option" class="sort-icon">{{ sortDesc ? 'arrow_downward' : 'arrow_upward' }}</mat-icon>
-            {{ option }}
-        </mat-chip-option>
-        <p>{{ getSortDescription(sortKey) }}</p>
-    </div>
-    <div *ngIf="user && albums" [ngClass]="!mobileView() ? 'album-container' : 'album-container-mobile'">
-        <div *ngFor="let entry of albums | albumSort:sortKey:sortDesc" [ngClass]="!mobileView() ? 'album-card' : 'album-card-mobile'">
-            <a href="{{ entry.api.album.external_urls.spotify }}" target="_blank">
-                <img src="{{ extractAlbumImage(entry.api.album.images) }}">
-            </a>
-            <div class="text-ellipsis">
-                <div class="text-ellipsis" matTooltip="{{ entry.api.album.name }}" matTooltipPosition="above"><strong>{{ entry.api.album.name }}</strong></div>
-                <span>{{ formatArtists(entry.api.album.artists) }}</span><br>
-                <mat-chip class="mat-chip-compact" style="margin-top: 0.4rem">{{ getSortDisplayValue(entry) }}</mat-chip>
+    <div *ngIf="user && albums">
+        <div class="album-sort-options">
+            <mat-chip-option *ngFor="let option of sortOptions" [selected]="sortKey == option" color="accent" (click)="sortKey == option ? sortDesc = !sortDesc : null; sortKey = option; " [selectable]="false">
+                <mat-icon *ngIf="sortKey == option" class="sort-icon">{{ sortDesc ? 'arrow_downward' : 'arrow_upward' }}</mat-icon>
+                {{ option }}
+            </mat-chip-option>
+            <p>{{ getSortDescription(sortKey) }}</p>
+        </div>
+        <p *ngIf="albums.length == 0">Not seeing your library? I might still be fetching your albums. Once that's done, try reloading.</p>
+        <div [ngClass]="!mobileView() ? 'album-container' : 'album-container-mobile'">
+            <div *ngFor="let entry of albums | albumSort:sortKey:sortDesc" [ngClass]="!mobileView() ? 'album-card' : 'album-card-mobile'">
+                <a href="{{ entry.api.album.external_urls.spotify }}" target="_blank">
+                    <img src="{{ extractAlbumImage(entry.api.album.images) }}">
+                </a>
+                <div class="text-ellipsis">
+                    <div class="text-ellipsis" matTooltip="{{ entry.api.album.name }}" matTooltipPosition="above"><strong>{{ entry.api.album.name }}</strong></div>
+                    <span>{{ formatArtists(entry.api.album.artists) }}</span><br>
+                    <mat-chip class="mat-chip-compact" style="margin-top: 0.4rem">{{ getSortDisplayValue(entry) }}</mat-chip>
+                </div>
             </div>
         </div>
     </div>
