@@ -19,7 +19,7 @@
         <p *ngIf="albums.length == 0">Not seeing your library? I might still be fetching your albums. Once that's done, try reloading.</p>
         <div [ngClass]="!mobileView() ? 'album-container' : 'album-container-mobile'">
             <div *ngFor="let entry of albums | albumSort:sortKey:sortDesc" [ngClass]="!mobileView() ? 'album-card' : 'album-card-mobile'">
-                <a href="{{ entry.api.album.external_urls.spotify }}" target="_blank">
+                <a href="{{ entry.api.album.uri }}" target="_blank">
                     <img src="{{ extractAlbumImage(entry.api.album.images) }}">
                 </a>
                 <div class="text-ellipsis">
