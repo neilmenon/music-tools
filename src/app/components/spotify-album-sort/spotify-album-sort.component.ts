@@ -12,6 +12,7 @@ import { LocalStorageService } from 'src/app/services/local-storage.service';
 })
 export class SpotifyAlbumSortComponent {
   innerWidth: number
+  listView: boolean
 
   pluralizePipe: PluralizePipe = new PluralizePipe()
   currentYear: number = new Date().getFullYear()

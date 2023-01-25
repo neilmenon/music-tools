@@ -3,10 +3,12 @@
 <div class="center-all page-container">
     <h1 class="page-title">Spotify Library Album Sort</h1>
     <p>
-        Provides some more ways to sort albums in your Spotify library which are not possible through the Spotify app.
-        <a routerLink="">Back to App List</a><br>
+        Provides some more ways to sort albums in your Spotify library which are not possible through the Spotify app.<br>
+        <a routerLink="" class="action-link">Back to App List</a>  • 
+        <a (click)="listView = !listView" class="action-link clickable">Toggle List/Grid View</a>
+        <br>
     </p>
-    <p><app-connect-spotify></app-connect-spotify></p>
+    <p *ngIf="!user"><app-connect-spotify></app-connect-spotify></p>
 
     <div *ngIf="user && albums">
         <div class="album-sort-options no-scrollbar-container">
@@ -17,7 +19,25 @@
         </div>
         <p>{{ getSortDescription() }}</p>
         <p *ngIf="albums.length == 0">Not seeing your library? I might still be fetching your albums. Once that's done, try reloading.</p>
-        <div [ngClass]="!mobileView() ? 'album-container' : 'album-container-mobile'">
+        <table style="width: 100%" *ngIf="listView">
+            <thead class="sticky-table-header">
+                <tr>
+                    <th class="table-border">No.</th>
+                    <th class="table-border">Sort Field</th>
+                    <th class="table-border">Artist</th>
+                    <th class="table-border">Album</th>
+                </tr>
+            </thead>
+            <tbody style="text-align: left">
+                <tr *ngFor="let entry of albums | albumSort:sortKey:sortDesc; let i = index">
+                    <td class="table-border center">{{ i + 1 }}</td>
+                    <td class="table-border">{{ getSortDisplayValue(entry) }}</td>
+                    <td class="table-border"><a href="{{ entry.api.album.artists[0].external_urls.spotify }}" target="_blank">{{ formatArtists(entry.api.album.artists) }}</a></td>
+                    <td class="table-border"><a href="{{ entry.api.album.external_urls.spotify }}" target="_blank">{{ entry.api.album.name }}</a></td>
+                </tr>
+            </tbody>
+        </table>
+        <div [ngClass]="!mobileView() ? 'album-container' : 'album-container-mobile'"  *ngIf="!listView">
             <div *ngFor="let entry of albums | albumSort:sortKey:sortDesc" [ngClass]="!mobileView() ? 'album-card' : 'album-card-mobile'">
                 <a href="{{ entry.api.album.external_urls.spotify }}" target="_blank">
                     <img src="{{ extractAlbumImage(entry.api.album.images) }}">

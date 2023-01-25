@@ -301,3 +301,40 @@ div > mat-chip-option:not(:last-child), mat-chip:not(:last-child) {
     width: 0;
     height: 0;
 }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-image: url(/assets/img/background.svg);
+    background: #222222;
+}
+
+table th {
+    /* border: 0.1px solid rgba(191, 191, 191, 0.534); */
+    padding: 0px;
+}
+
+table > tbody > tr:nth-child(odd) {
+    background: rgb(44, 44, 44);
+}
+
+.table-border {
+    border: 0.5px solid #bfbfbf3d;
+    padding: 2px 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    max-width: 350px;
+    text-overflow: ellipsis;
+}
+
+.sticky-table-header th {
+    position: sticky;
+    top: -1px;
+    background: #212121;
+    box-shadow: inset 0.5px 0.5px #bfbfbf3d, 0 0.5px #bfbfbf3d;
+}
+
+.action-link {
+    color: #7ca3c9;
+    font-weight: 500;
+}
