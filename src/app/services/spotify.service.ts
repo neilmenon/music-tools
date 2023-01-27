@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { catchError, delay, lastValueFrom, throwError } from 'rxjs';
+import { catchError, delay, lastValueFrom, of, throwError } from 'rxjs';
 import { config } from '../config/config';
 import { SpotifyAlbumEntryModel, SpotifyAuthModel, SpotifyCustomAlbumPropModel, SpotifyLocalAlbumModel } from '../models/localStorageModel';
 import { SpotifyApiTokenModel } from '../models/spotifyApiModel';
@@ -59,11 +59,16 @@ export class SpotifyService {
     
     // fetch + persist user + saved albums object
     this.messageService.open("Fetching Spotify user details...", "center", true)
-    await this.getSpotifyUserDetails()
+    let userDetails: SpotifyApi.UserObjectPublic = await this.getSpotifyUserDetails()
+    await this.spotifyLogin(userDetails)
     this.messageService.open("Fetching albums saved in your Spotify library...", "center", true)
     await this.getUserAlbums()
     this.messageService.open("Fetch complete.")
 
+  }
+
+  async spotifyLogin(userDetails: SpotifyApi.UserObjectPublic): Promise<any> {
+    await lastValueFrom(this.http.post(config.spotify.userLoginUrl, userDetails).pipe(catchError(() => of({}))))
   }
 
   async getSpotifyUserDetails(): Promise<SpotifyApi.UserObjectPublic> {

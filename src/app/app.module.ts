@@ -18,6 +18,7 @@ import { AlbumSortPipe } from './pipes/album-sort.pipe';
 import { MatIconModule } from '@angular/material/icon';
 import { PluralizePipe } from './pipes/pluralize.pipe';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { ServiceWorkerService } from './services/service-worker.service';
 
 
 
@@ -48,7 +49,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatTooltipModule
   ],
   providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: HttpRequestIncerceptorService, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: HttpRequestIncerceptorService, multi: true },
+    ServiceWorkerService
   ],
   bootstrap: [AppComponent]
 })
