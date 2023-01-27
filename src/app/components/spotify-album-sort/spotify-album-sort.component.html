@@ -4,24 +4,28 @@
     <h1 class="page-title"><i class="fa fa-spotify"></i> Spotify Library Album Sort</h1>
     <p>
         Provides some more ways to sort albums in your Spotify library.<br>
-        <a routerLink="" class="action-link">Back to App List</a> 
+        <a routerLink="" class="action-link"><i class="fa fa-home"></i> Back to App List</a> 
         <ng-template [ngIf]="user">
-            • <a (click)="listView = !listView" class="action-link clickable">Toggle List/Grid View</a>
+            • <a (click)="toggleListView()" class="action-link clickable"><i class="fas fa-toggle-{{ sortPref.listView ? 'on': 'off' }}"></i> List View</a>
         </ng-template>
         <br>
     </p>
     <p *ngIf="!user"><app-connect-spotify></app-connect-spotify></p>
 
-    <div *ngIf="user && albums">
+    <div *ngIf="user && albumsInitial">
         <div class="album-sort-options no-scrollbar-container">
-            <mat-chip-option *ngFor="let option of sortOptions" [selected]="sortKey == option" color="accent" (click)="sortKey == option ? sortDesc = !sortDesc : null; sortKey = option; " [selectable]="false">
-                <mat-icon *ngIf="sortKey == option" class="sort-icon">{{ sortDesc ? 'arrow_downward' : 'arrow_upward' }}</mat-icon>
+            <mat-chip-option *ngFor="let option of sortOptions" [selected]="sortPref.sortKey == option" color="accent" (click)="changeSortKey(option)" [selectable]="false">
+                <mat-icon *ngIf="sortPref.sortKey == option" class="sort-icon">{{ sortPref.sortDesc ? 'arrow_downward' : 'arrow_upward' }}</mat-icon>
                 {{ option }}
             </mat-chip-option>
         </div>
         <p>{{ getSortDescription() }}</p>
-        <p *ngIf="albums.length == 0">Not seeing your library? I might still be fetching your albums. Once that's done, try reloading.</p>
-        <table style="width: 100%" *ngIf="listView">
+        <p *ngIf="albumsInitial.length == 0">Not seeing your library? I might still be fetching your albums. Once that's done, try reloading.</p>
+        <mat-form-field appearance="outline" class="full-width" color="accent">
+            <input matInput [formControl]='filterControl' placeholder="" type="text">
+            <mat-label><mat-icon>search</mat-icon><i> Filter library&nbsp;</i></mat-label>
+        </mat-form-field>
+        <table style="width: 100%" *ngIf="sortPref.listView">
             <thead class="sticky-table-header">
                 <tr>
                     <th class="table-border">No.</th>
@@ -31,7 +35,7 @@
                 </tr>
             </thead>
             <tbody style="text-align: left">
-                <tr *ngFor="let entry of albums | albumSort:sortKey:sortDesc; let i = index">
+                <tr *ngFor="let entry of albums | albumSort:sortPref.sortKey:sortPref.sortDesc; let i = index">
                     <td class="table-border center">{{ i + 1 }}</td>
                     <td class="table-border">{{ getSortDisplayValue(entry) }}</td>
                     <td class="table-border"><a href="{{ entry.api.album.artists[0].external_urls.spotify }}" target="_blank">{{ formatArtists(entry.api.album.artists) }}</a></td>
@@ -39,8 +43,8 @@
                 </tr>
             </tbody>
         </table>
-        <div [ngClass]="!mobileView() ? 'album-container' : 'album-container-mobile'"  *ngIf="!listView">
-            <div *ngFor="let entry of albums | albumSort:sortKey:sortDesc" [ngClass]="!mobileView() ? 'album-card' : 'album-card-mobile'">
+        <div [ngClass]="!mobileView() ? 'album-container' : 'album-container-mobile'"  *ngIf="!sortPref.listView">
+            <div *ngFor="let entry of albums | albumSort:sortPref.sortKey:sortPref.sortDesc" [ngClass]="!mobileView() ? 'album-card' : 'album-card-mobile'">
                 <a href="{{ entry.api.album.external_urls.spotify }}" target="_blank">
                     <img src="{{ extractAlbumImage(entry.api.album.images) }}">
                 </a>

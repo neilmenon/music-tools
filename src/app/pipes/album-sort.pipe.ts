@@ -26,6 +26,9 @@ export class AlbumSortPipe implements PipeTransform {
       case "Popularity": return sortDesc ? albums.sort((a, b) => b.api.album.popularity - a.api.album.popularity) : 
         albums.sort((a, b) => a.api.album.popularity - b.api.album.popularity)
 
+      case "Label": return sortDesc ? albums.sort((a, b) => b.api.album.label < a.api.album.label ? -1 : 1) : 
+        albums.sort((a, b) => a.api.album.label < b.api.album.label ? -1 : 1)
+
       default: return sortDesc ? albums.sort((a, b) => moment(b.api.added_at).unix() - moment(a.api.added_at).unix()) :
         albums.sort((a, b) => moment(a.api.added_at).unix() - moment(b.api.added_at).unix())
     }
@@ -42,6 +45,6 @@ export class AlbumSortPipe implements PipeTransform {
   }
 }
 
-export const albumSortOptions = ["Added", "Release Date", "Duration", "# of Tracks", "Anniversary", "Popularity"] as const
+export const albumSortOptions = ["Added", "Release Date", "Duration", "# of Tracks", "Anniversary", "Popularity", "Label"] as const
 export type AlbumSortKey = typeof albumSortOptions[number]
 export type SortOrder = "asc" | "desc"

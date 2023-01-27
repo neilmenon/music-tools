@@ -1,6 +1,8 @@
 import { Component, HostListener } from '@angular/core';
+import { FormControl } from '@angular/forms';
 import * as moment from 'moment';
-import { SpotifyAlbumEntryModel } from 'src/app/models/localStorageModel';
+import { debounceTime, distinctUntilChanged } from 'rxjs';
+import { SpotifyAlbumEntryModel, UserPreferenceSpotifySortModel } from 'src/app/models/localStorageModel';
 import { AlbumSortKey, albumSortOptions, SortOrder } from 'src/app/pipes/album-sort.pipe';
 import { PluralizePipe } from 'src/app/pipes/pluralize.pipe';
 import { LocalStorageService } from 'src/app/services/local-storage.service';
@@ -12,7 +14,6 @@ import { LocalStorageService } from 'src/app/services/local-storage.service';
 })
 export class SpotifyAlbumSortComponent {
   innerWidth: number
-  listView: boolean
 
   pluralizePipe: PluralizePipe = new PluralizePipe()
   currentYear: number = new Date().getFullYear()
@@ -22,11 +23,13 @@ export class SpotifyAlbumSortComponent {
     this.innerWidth = event.target.innerWidth
   }
 
-  sortKey: AlbumSortKey = "Added"
-  sortDesc: boolean = true
+  sortPref: UserPreferenceSpotifySortModel
   sortOptions = albumSortOptions
 
+  albumsInitial: SpotifyAlbumEntryModel[] = []
   albums: SpotifyAlbumEntryModel[] = []
+
+  filterControl: FormControl = new FormControl()
 
   constructor(
     private localStorageService: LocalStorageService
@@ -52,7 +55,16 @@ export class SpotifyAlbumSortComponent {
       }
     });
 
-    this.albums = this.localStorageService.getSpotifySavedAlbums() ? this.localStorageService.getSpotifySavedAlbums().data : []
+    this.albumsInitial = this.localStorageService.getSpotifySavedAlbums() ? this.localStorageService.getSpotifySavedAlbums().data : []
+    this.albums = this.albumsInitial
+
+    this.filterControl.valueChanges.pipe(debounceTime(200), distinctUntilChanged()).subscribe(() => {
+      this.albums = this.filterControl.value?.trim()?.length ? 
+        this.albumsInitial.filter(x => `${ x.api.album.name } ${ this.formatArtists(x.api.album.artists) }`.toLowerCase().includes(this.filterControl.value.toLowerCase())) : 
+        this.albumsInitial
+    })
+
+    this.sortPref = this.localStorageService.getUserPreferences().spotifySort
   }
 
   get user(): SpotifyApi.UserObjectPublic { 
@@ -72,18 +84,19 @@ export class SpotifyAlbumSortComponent {
   }
 
   getSortDisplayValue(entry: SpotifyAlbumEntryModel): string {
-    switch(this.sortKey) {
+    switch(this.sortPref.sortKey) {
       case "Release Date": return moment(entry.api.album.release_date).format("MM-DD-yyyy")
       case "Duration": return this.formatDuration(entry.custom.duration)
       case "# of Tracks": return this.pluralizePipe.transform(entry.api.album.total_tracks, "track")
       case "Anniversary": return `${ this.getOrdinal(this.currentYear - moment(entry.api.album.release_date).year()) } • ${ moment(entry.api.album.release_date).format("MMM D") } • ${ moment(entry.api.album.release_date).set("year", this.currentYear).fromNow() }` 
       case "Popularity": return `Score: ${ entry.api.album.popularity }`
+      case "Label": return entry.api.album.label
       default: return moment(entry.api.added_at).format("MM-DD-yyyy hh:mm A")
     }
   }
 
   getSortDescription(): string {
-    switch(this.sortKey) { 
+    switch(this.sortPref.sortKey) { 
       case "Popularity": return `Uses Spotify's score. Your Spotify library is ${ Math.round(this.albums.map(x => x.api.album.popularity).reduce((a, b) => a + b) / this.albums.length) }% mainstream.`
       case "Anniversary": return "Shows when the next anniversary for the album is, so you can listen on that day!"
       default: return ""
@@ -117,5 +130,22 @@ export class SpotifyAlbumSortComponent {
     }
   
     return n + ord
+  }
+
+  toggleListView() {
+    this.sortPref.listView = !this.sortPref.listView
+    this.updateUserPref()
+  }
+
+  changeSortKey(option: AlbumSortKey) {
+    this.sortPref.sortKey == option ? this.sortPref.sortDesc = !this.sortPref.sortDesc : null
+    this.sortPref.sortKey = option
+    this.updateUserPref()
+  }
+
+  updateUserPref() {
+    let userPref = this.localStorageService.getUserPreferences()
+    userPref.spotifySort = this.sortPref
+    this.localStorageService.setUserPreferences(userPref)
   }
 }

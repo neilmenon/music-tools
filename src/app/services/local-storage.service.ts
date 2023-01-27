@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { SPOTIFY_ALBUM_LOCAL, SPOTIFY_AUTH_LOCAL, SPOTIFY_USER_LOCAL } from '../constants/localStorageConstants';
-import { SpotifyAlbumEntryModel, SpotifyAuthModel, SpotifyLocalAlbumModel } from '../models/localStorageModel';
+import { SPOTIFY_ALBUM_LOCAL, SPOTIFY_AUTH_LOCAL, SPOTIFY_USER_LOCAL, USER_PREF_LOCAL } from '../constants/localStorageConstants';
+import { SpotifyAlbumEntryModel, SpotifyAuthModel, SpotifyLocalAlbumModel, UserPreferenceModel } from '../models/localStorageModel';
 import * as moment from 'moment';
 import { MessageService } from './message.service';
 
@@ -52,5 +52,14 @@ export class LocalStorageService {
     localStorage.removeItem(SPOTIFY_USER_LOCAL)
     
     this.messageService.open("Disconnected your Spotify account and cleared local data.")
+  }
+
+  getUserPreferences(): UserPreferenceModel {
+    return JSON.parse(localStorage.getItem(USER_PREF_LOCAL)) ? JSON.parse(localStorage.getItem(USER_PREF_LOCAL)) : this.setUserPreferences(new UserPreferenceModel)
+  }
+
+  setUserPreferences(userPref: UserPreferenceModel): UserPreferenceModel {
+    localStorage.setItem(USER_PREF_LOCAL, JSON.stringify(userPref))
+    return this.getUserPreferences()
   }
 }

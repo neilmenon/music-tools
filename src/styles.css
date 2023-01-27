@@ -338,3 +338,7 @@ table > tbody > tr:nth-child(odd) {
     color: #7ca3c9;
     font-weight: 500;
 }
+
+.full-width {
+    width: 100%;
+}

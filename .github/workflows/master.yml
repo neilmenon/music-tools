@@ -34,7 +34,7 @@ jobs:
           
       - name: Create config.ts file
         run: |
-          echo 'export const config = { spotify: { clientId: "${{ secrets.SPOTIFY_CLIENT_ID }}", authCodeUrl: "${{ secrets.AUTH_CODE_URL }}", redirectUri: "${{ secrets.SPOTIFY_REDIRECT_URI }}", scope: "${{ secrets.SPOTIFY_SCOPES }}", userLoginUrl: "{{ secrets.SPOTIFY_LOG_URL }}" } }' > ./src/app/config/config.ts
+          echo 'export const config = { spotify: { clientId: "${{ secrets.SPOTIFY_CLIENT_ID }}", authCodeUrl: "${{ secrets.AUTH_CODE_URL }}", redirectUri: "${{ secrets.SPOTIFY_REDIRECT_URI }}", scope: "${{ secrets.SPOTIFY_SCOPES }}", userLoginUrl: "${{ secrets.SPOTIFY_LOG_URL }}" } }' > ./src/app/config/config.ts
           
       - name: npm install and ng build
         run: |

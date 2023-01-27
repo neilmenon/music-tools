@@ -19,7 +19,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { PluralizePipe } from './pipes/pluralize.pipe';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ServiceWorkerService } from './services/service-worker.service';
-
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { ReactiveFormsModule } from '@angular/forms';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 
 @NgModule({
@@ -46,7 +49,12 @@ import { ServiceWorkerService } from './services/service-worker.service';
     MatSnackBarModule,
     MatChipsModule,
     MatIconModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatFormFieldModule,
+    MatInputModule,
+    ReactiveFormsModule,
+    BrowserAnimationsModule
+
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: HttpRequestIncerceptorService, multi: true },
