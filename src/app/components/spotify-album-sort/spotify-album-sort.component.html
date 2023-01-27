@@ -3,9 +3,11 @@
 <div class="center-all page-container">
     <h1 class="page-title"><i class="fa fa-spotify"></i> Spotify Library Album Sort</h1>
     <p>
-        Provides some more ways to sort albums in your Spotify library which are not possible through the Spotify app.<br>
-        <a routerLink="" class="action-link">Back to App List</a>  • 
-        <a (click)="listView = !listView" class="action-link clickable">Toggle List/Grid View</a>
+        Provides some more ways to sort albums in your Spotify library.<br>
+        <a routerLink="" class="action-link">Back to App List</a> 
+        <ng-template [ngIf]="user">
+            • <a (click)="listView = !listView" class="action-link clickable">Toggle List/Grid View</a>
+        </ng-template>
         <br>
     </p>
     <p *ngIf="!user"><app-connect-spotify></app-connect-spotify></p>
