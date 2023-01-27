@@ -27,9 +27,11 @@ export class SpotifyCustomAlbumPropModel {
 
 export class UserPreferenceModel {
     spotifySort: UserPreferenceSpotifySortModel
+    emails: boolean
 
     constructor() {
         this.spotifySort = new UserPreferenceSpotifySortModel()
+        this.emails = false
     }
 }
 

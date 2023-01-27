@@ -12,7 +12,9 @@ import { MessageService } from './message.service';
 export class LocalStorageService {
   moment: any = moment
 
-  constructor(private messageService: MessageService) { }
+  constructor(
+    private messageService: MessageService,
+  ) { }
 
   getSpotifyAuthDetails(): SpotifyAuthModel {
     return JSON.parse(localStorage.getItem(SPOTIFY_AUTH_LOCAL))
@@ -47,7 +49,7 @@ export class LocalStorageService {
     return this.getSpotifySavedAlbums()
   }
 
-  clearSpotifyUserData() {
+  async clearSpotifyUserData() {
     localStorage.removeItem(SPOTIFY_AUTH_LOCAL)
     localStorage.removeItem(SPOTIFY_USER_LOCAL)
     

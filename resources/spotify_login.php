@@ -17,7 +17,13 @@ $data = json_decode($json);
 if (!empty($data)) {
     $now = new DateTime(null, new DateTimeZone('America/New_York'));
 
-    $log_string = sprintf("[%s] New Spotify login from: %s | %s | %s", $now->format("Y-m-d\TH:i:sO"), $data->display_name, $data->email, $data->id);
+    if (isset($data->emailNotifs)) {
+        $log_string = sprintf("[%s | %s | %s | %s] Email notification pref change: %s", $now->format("Y-m-d\TH:i:sO"), $data->display_name, $data->email, $data->id, $data->emailNotifs ? 'ON': 'OFF');
+    } else if (isset($data->logout)) {
+        $log_string = sprintf("[%s | %s | %s | %s] Spotify account disconnected", $now->format("Y-m-d\TH:i:sO"), $data->display_name, $data->email, $data->id);
+    } else {
+        $log_string = sprintf("[%s | %s | %s | %s] New Spotify login", $now->format("Y-m-d\TH:i:sO"), $data->display_name, $data->email, $data->id);
+    }
 
     $current = file_get_contents($configs['log_file_location']);
     $current .= $log_string . "\n";
