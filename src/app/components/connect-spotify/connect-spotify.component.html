@@ -1,9 +1,9 @@
-<button mat-raised-button color="accent" *ngIf="!user" (click)="spotifyService.redirectToAuthorizationPage()" class="spotify-button">
-    Connect Spotify
+<button mat-raised-button color="accent" *ngIf="(!user && showConnectButton) || needMoreScopes" (click)="spotifyService.redirectToAuthorizationPage(tool)" class="spotify-button">
+    {{ needMoreScopes ? 'Re-Connect Spotify' : 'Connect Spotify' }}
 </button>
-<button mat-flat-button *ngIf="user" (click)="disconnect()">
+<button mat-flat-button *ngIf="user && !tool" (click)="disconnect()">
     Disconnect {{ localStorageService.getSpotifyUserDetails()?.display_name }}
 </button>
-<div *ngIf="user">
+<!-- <div *ngIf="user">
     <mat-checkbox (change)="changeEmailPref()" [checked]="userPref.emails">Keep me posted on app updates via my Spotify email address (I won't spam you)!</mat-checkbox>
-</div>
+</div> -->

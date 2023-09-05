@@ -7,7 +7,7 @@
         Here are various mini tools for music apps that I personally find useful in day-to-day life. Hope these provide some utility for you, too!<br>
         <a class="action-link" href="https://github.com/neilmenon/music-tools" target="href"><i class="fa fa-github"></i> Github</a>
         <br><br>
-        <app-connect-spotify></app-connect-spotify>
+        <app-connect-spotify [showConnectButton]="false"></app-connect-spotify>
     </p>
 
     <div class="app-list-container container">
@@ -19,10 +19,10 @@
             </p>
         </div>
         <div class="box">
-            <h1><i class="fa fa-spotify"></i> Anniversify</h1>
-            <p>Get notified when an album in your Spotify Library has an anniversary.</p>
+            <h1 [routerLink]="['anniversify']" class="clickable"><i class="fa fa-spotify"></i> Anniversify</h1>
+            <p>Notifies you when an album in your Spotify Library has an anniversary.</p>
             <p>
-                <button mat-raised-button color="accent" disabled>Coming Soon</button>
+                <button mat-raised-button color="accent" [routerLink]="['anniversify']">Launch</button>
             </p>
         </div>
     </div>

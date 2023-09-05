@@ -342,3 +342,8 @@ table > tbody > tr:nth-child(odd) {
 .full-width {
     width: 100%;
 }
+
+.mat-mdc-raised-button.mat-primary {
+    --mdc-protected-button-container-color: #577a9c;
+    --mdc-protected-button-label-text-color: #fff;
+}

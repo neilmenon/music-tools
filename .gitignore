@@ -43,5 +43,6 @@ Thumbs.db
 
 # app config
 config.ts
+config.secrets.ts
 app-config.php
 nmt.log

@@ -6,11 +6,16 @@
         Provides some more ways to sort albums in your Spotify library.<br>
         <a routerLink="" class="action-link"><i class="fa fa-home"></i> Back to App List</a> 
         <ng-template [ngIf]="user">
-            • <a (click)="toggleListView()" class="action-link clickable"><i class="fas fa-toggle-{{ sortPref.listView ? 'on': 'off' }}"></i> List View</a>
+            • <a (click)="toggleListView()" class="action-link clickable"><i class="fas fa-toggle-{{ sortPref.listView ? 'on': 'off' }}"></i> List View</a> 
+            • <a (click)="canRefetchLibrary && !fetchLoading ? fetchLibrary() : null" [ngClass]="{ 'action-link clickable': canRefetchLibrary, 'grayed-out': !canRefetchLibrary }"
+                [matTooltip]="canRefetchLibrary ? 'Re-fetch library now! This can be done once every 24 hours.' : 'You may refetch your Spotify libray every 24 hours. You can refetch your library in ' + moment.duration(nextFetchDate.diff(moment())).locale('en-US').humanize() + '.'"
+                >
+                <i class="fas fa-sync-alt {{ fetchLoading ? 'fa-spin' : '' }}"></i> {{ !fetchLoading && !canRefetchLibrary ? 'Fetch Spotify Library (' + moment.duration(nextFetchDate.diff(moment())).humanize() + ')' : (canRefetchLibrary && !fetchLoading ? 'Fetch Spotify Library' : 'Fetching...') }}
+            </a>
         </ng-template>
         <br>
     </p>
-    <p *ngIf="!user"><app-connect-spotify></app-connect-spotify></p>
+    <app-connect-spotify [tool]="'librarySort'"></app-connect-spotify>
 
     <div *ngIf="user && albumsInitial">
         <div class="album-sort-options no-scrollbar-container">
@@ -20,7 +25,7 @@
             </mat-chip-option>
         </div>
         <p>{{ getSortDescription() }}</p>
-        <p *ngIf="albumsInitial.length == 0">Not seeing your library? I might still be fetching your albums. Once that's done, try reloading.</p>
+        <p *ngIf="albumsInitial.length == 0">Not seeing your library? Click <strong>Fetch Spotify Library</strong>!</p>
         <mat-form-field appearance="outline" class="full-width" color="accent">
             <input matInput [formControl]='filterControl' placeholder="" type="text">
             <mat-label><mat-icon>search</mat-icon><i> Filter library&nbsp;</i></mat-label>

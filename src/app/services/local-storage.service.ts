@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { SPOTIFY_ALBUM_LOCAL, SPOTIFY_AUTH_LOCAL, SPOTIFY_USER_LOCAL, USER_PREF_LOCAL } from '../constants/localStorageConstants';
+import { ANNIVERSIFY_DEVICE_TOKENS_SENT, SPOTIFY_ALBUM_LOCAL, SPOTIFY_AUTH_LOCAL, SPOTIFY_USER_LOCAL, USER_PREF_LOCAL } from '../constants/localStorageConstants';
 import { SpotifyAlbumEntryModel, SpotifyAuthModel, SpotifyLocalAlbumModel, UserPreferenceModel } from '../models/localStorageModel';
 import * as moment from 'moment';
 import { MessageService } from './message.service';
@@ -52,6 +52,7 @@ export class LocalStorageService {
   async clearSpotifyUserData() {
     localStorage.removeItem(SPOTIFY_AUTH_LOCAL)
     localStorage.removeItem(SPOTIFY_USER_LOCAL)
+    localStorage.removeItem(ANNIVERSIFY_DEVICE_TOKENS_SENT)
     
     this.messageService.open("Disconnected your Spotify account and cleared local data.")
   }
@@ -63,5 +64,13 @@ export class LocalStorageService {
   setUserPreferences(userPref: UserPreferenceModel): UserPreferenceModel {
     localStorage.setItem(USER_PREF_LOCAL, JSON.stringify(userPref))
     return this.getUserPreferences()
+  }
+
+  setAnniversifyDeviceTokensSent(value: boolean) {
+    localStorage.setItem(ANNIVERSIFY_DEVICE_TOKENS_SENT, `${ value }`)
+  }
+
+  getAnniversifyDeviceTokensSent(): boolean {
+    return localStorage.getItem(ANNIVERSIFY_DEVICE_TOKENS_SENT) == "true" ? true : false
   }
 }

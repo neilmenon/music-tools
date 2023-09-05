@@ -6,6 +6,7 @@ import { LocalStorageService } from './local-storage.service';
 import { SpotifyService } from './spotify.service';
 import { MessageService } from './message.service';
 import { ErrorHandlerService } from './error-handler.service';
+import { config } from '../config/config';
 
 @Injectable({
   providedIn: 'root'
@@ -25,6 +26,13 @@ export class HttpRequestIncerceptorService implements HttpInterceptor {
   }
 
   async handle(req: HttpRequest<any>, next: HttpHandler) {
+    if (req.url.includes("api.spotify.com") || req.url.includes(config.anniversify.apiRoot) &&
+      moment().unix() >= this.localStorageService.getSpotifyAuthDetails()?.expiresUnix
+    ) {
+      // refresh token handling (preventative)
+      await this.spotifyService.refreshToken()
+    }
+
     if (req.url.includes("api.spotify.com")) {
       req = req.clone({
         setHeaders: {
@@ -32,10 +40,14 @@ export class HttpRequestIncerceptorService implements HttpInterceptor {
         },
       })
       
-      if (moment().unix() >= this.localStorageService.getSpotifyAuthDetails()?.expiresUnix) {
-        // refresh token handling (preventative)
-        await this.spotifyService.refreshToken()
-      }
+    } else if (req.url.includes(config.anniversify.apiRoot)) {
+      let tokenToSend: string = this.localStorageService.getAnniversifyDeviceTokensSent() ? `${this.localStorageService.getSpotifyAuthDetails()?.data.refresh_token}` : `${this.localStorageService.getSpotifyAuthDetails()?.data.access_token}`
+      req = req.clone({
+        setHeaders: {
+          'Authorization': tokenToSend,
+          'SpotifyUserId': `${this.localStorageService.getSpotifyUserDetails()?.id}`
+        },
+      })
     }
 
     return await lastValueFrom(next.handle(req).pipe(

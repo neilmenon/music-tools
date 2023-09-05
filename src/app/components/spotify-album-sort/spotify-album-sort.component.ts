@@ -6,6 +6,7 @@ import { SpotifyAlbumEntryModel, UserPreferenceSpotifySortModel } from 'src/app/
 import { AlbumSortKey, albumSortOptions, SortOrder } from 'src/app/pipes/album-sort.pipe';
 import { PluralizePipe } from 'src/app/pipes/pluralize.pipe';
 import { LocalStorageService } from 'src/app/services/local-storage.service';
+import { SpotifyService } from 'src/app/services/spotify.service';
 
 @Component({
   selector: 'app-spotify-album-sort',
@@ -28,11 +29,18 @@ export class SpotifyAlbumSortComponent {
 
   albumsInitial: SpotifyAlbumEntryModel[] = []
   albums: SpotifyAlbumEntryModel[] = []
+  moment = moment
+
 
   filterControl: FormControl = new FormControl()
 
+  fetchLoading: boolean
+  lastFetchDate: moment.Moment
+  nextFetchDate: moment.Moment
+
   constructor(
-    private localStorageService: LocalStorageService
+    private localStorageService: LocalStorageService,
+    private spotifyService: SpotifyService
   ) {
     this.innerWidth = window.innerWidth
 
@@ -44,18 +52,20 @@ export class SpotifyAlbumSortComponent {
         ss: '%ds',
         m:  '1m',
         mm: '%dm',
-        h:  '1h ago',
-        hh: '%dh ago',
-        d:  '1d ago',
-        dd: '%dd ago',
-        M:  '1mo ago',
-        MM: '%dmo ago',
-        y:  '1y ago',
-        yy: '%dY ago'
+        h:  '1h',
+        hh: '%dh',
+        d:  '1d',
+        dd: '%dd',
+        M:  '1mo',
+        MM: '%dmo',
+        y:  '1y',
+        yy: '%dY'
       }
     });
 
     this.albumsInitial = this.localStorageService.getSpotifySavedAlbums() ? this.localStorageService.getSpotifySavedAlbums().data : []
+    this.lastFetchDate = this.localStorageService.getSpotifySavedAlbums()?.fetchedDate ? moment(this.localStorageService.getSpotifySavedAlbums().fetchedDate) : null
+    this.nextFetchDate = this.lastFetchDate ? moment(this.localStorageService.getSpotifySavedAlbums().fetchedDate).add(1, 'days') : null
     this.albums = this.albumsInitial
 
     this.filterControl.valueChanges.pipe(debounceTime(200), distinctUntilChanged()).subscribe(() => {
@@ -69,6 +79,16 @@ export class SpotifyAlbumSortComponent {
 
   get user(): SpotifyApi.UserObjectPublic { 
     return this.localStorageService.getSpotifyUserDetails()
+  }
+
+  get canRefetchLibrary(): boolean {
+    return !this.lastFetchDate || (this.lastFetchDate && moment().diff(this.lastFetchDate, 'days') >= 1)
+  }
+
+  async fetchLibrary() {
+    this.fetchLoading = true
+    await this.spotifyService.getUserAlbums()
+    window.location.reload()
   }
 
   extractAlbumImage(images: SpotifyApi.ImageObject[]): string {

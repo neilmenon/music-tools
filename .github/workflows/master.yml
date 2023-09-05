@@ -34,7 +34,7 @@ jobs:
           
       - name: Create config.ts file
         run: |
-          echo 'export const config = { spotify: { clientId: "${{ secrets.SPOTIFY_CLIENT_ID }}", authCodeUrl: "${{ secrets.AUTH_CODE_URL }}", redirectUri: "${{ secrets.SPOTIFY_REDIRECT_URI }}", scope: "${{ secrets.SPOTIFY_SCOPES }}", userLoginUrl: "${{ secrets.SPOTIFY_LOG_URL }}" } }' > ./src/app/config/config.ts
+          echo 'export const config = { spotify: { clientId: "${{ secrets.SPOTIFY_CLIENT_ID }}", authCodeUrl: "${{ secrets.AUTH_CODE_URL }}", redirectUri: "${{ secrets.SPOTIFY_REDIRECT_URI }}", scopes: { librarySort: "${{ secrets.SPOTIFY_SCOPES_LIBRARY_SORT }}", anniversify: "${{ secrets.SPOTIFY_SCOPES_ANNIVERSIFY }}" }, }, anniversify: { apiRoot: "${{ secrets.ANNIVERSIFY_API_ROOT }}", emailSender: "${{ secrets.ANNIVERSIFY_EMAIL_SENDER }}" }, }' > ./src/app/config/config.ts
           
       - name: npm install and ng build
         run: |
@@ -45,8 +45,7 @@ jobs:
         run: |
           mkdir ./dist/music-tools/resources
           cp ./resources/spotify_auth.php ./dist/music-tools/resources/
-          cp ./resources/spotify_login.php ./dist/music-tools/resources/
-          echo '<?php return array( "client_id" => "${{ secrets.SPOTIFY_CLIENT_ID }}", "client_secret" => "${{ secrets.SPOTIFY_CLIENT_SECRET }}", "redirect_uri" => "${{ secrets.SPOTIFY_REDIRECT_URI }}", "prod" => true, "log_file_location" => "${{ secrets.LOG_FILE_LOCATION }}" ); ?>' > ./dist/music-tools/resources/app-config.php
+          echo '<?php return array( "client_id" => "${{ secrets.SPOTIFY_CLIENT_ID }}", "client_secret" => "${{ secrets.SPOTIFY_CLIENT_SECRET }}", "redirect_uri" => "${{ secrets.SPOTIFY_REDIRECT_URI }}", "prod" => true ); ?>' > ./dist/music-tools/resources/app-config.php
           
       - name: Copy files to server web root
         uses: appleboy/scp-action@master
