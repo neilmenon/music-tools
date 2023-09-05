@@ -11,9 +11,9 @@
         <div class="box center" style="overflow: unset;" *ngIf="anniversifyDetails">
             <h2>Summary</h2>
             <span style="color: #009688;"><i class="fas fa-check-circle"></i></span> Hey, {{ anniversifyDetails.name }}. Your Anniversify schedule is active!<br>
-            <span *ngIf="anniversifyDetails.lastRun">It last ran <span [matTooltip]="moment(anniversifyDetails.lastRun).format()" style="text-decoration: underline;">{{ moment(anniversifyDetails.lastRun).fromNow() }}</span>. </span>
+            <span *ngIf="anniversifyDetails.lastRun">It last ran <span [matTooltip]="moment(anniversifyDetails.lastRun).format()" style="text-decoration: underline;">{{ moment(anniversifyDetails.lastRun).locale('en-US').fromNow() }}</span>. </span>
             <span *ngIf="!anniversifyDetails.lastRun">Your first run should occur within 24 hours. </span> 
-            <span *ngIf="anniversifyDetails.libraryLastFetched">Your Spotify library is updated weekly, last fetched <span [matTooltip]="moment(anniversifyDetails.libraryLastFetched).format()" style="text-decoration: underline;">{{ moment(anniversifyDetails.libraryLastFetched).fromNow() }}</span>.</span>
+            <span *ngIf="anniversifyDetails.libraryLastFetched">Your Spotify library is updated weekly, last fetched <span [matTooltip]="moment(anniversifyDetails.libraryLastFetched).format()" style="text-decoration: underline;">{{ moment(anniversifyDetails.libraryLastFetched).locale('en-US').fromNow() }}</span>.</span>
             <span *ngIf="!anniversifyDetails.libraryLastFetched">Your Spotify library will be updated weekly.</span>
             <span *ngIf="moment().diff(moment(anniversifyDetails.registerDate), 'days') <= 15"><br><hr>If you enabled email notifications, a welcome email was sent from <u>{{ emailSender }}</u>.<br><strong>Please check your spam/junk and make sure to WHITELIST this email so that you'll recieve notifications properly!</strong></span>
             <ng-container *ngIf="showDeleteConfirmation">
@@ -56,10 +56,14 @@
                 </div>
                 <div>
                     <h2>Notification Settings</h2>
-                    <mat-checkbox formControlName="albumsOnly" matTooltip="Only be notified for albums in your library. Unfortunately, Spotify's API combines singles and EPs into the same category, so notifications for EPs cannot be enabled without also enabling singles notifications.">
+                    <mat-checkbox formControlName="albumsOnly">
                         Exclude singles, EPs and compilation anniversaries
                     </mat-checkbox>
-                    <h3>Notification Time</h3>
+                    <p>
+                        Only be notified for albums in your library. Recommended if you save a lot of non-albums to your library. Spotify's API combines singles and EPs into the same category, so notifications for EPs cannot be enabled without also enabling singles notifications.
+                    </p>
+                    <h3 style="margin-top: 1rem;">Notification Time</h3>
+                    <p style="padding-bottom: 0.25rem;">Choose the time that works best for you. Morning listener? Set it a couple hours before you wake up. Listen to music after work? Choose a time in the evening!</p>
                     <input type="time" formControlName="notifyTime" id="notifyTime" [class.field-error]="saveClicked && !anniversifyForm.controls['notifyTime'].valid"/>
                     <br><br>
                     <mat-form-field appearance="fill">

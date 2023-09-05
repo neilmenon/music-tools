@@ -65,7 +65,7 @@ export class SpotifyAlbumSortComponent {
 
     this.albumsInitial = this.localStorageService.getSpotifySavedAlbums() ? this.localStorageService.getSpotifySavedAlbums().data : []
     this.lastFetchDate = this.localStorageService.getSpotifySavedAlbums()?.fetchedDate ? moment(this.localStorageService.getSpotifySavedAlbums().fetchedDate) : null
-    this.nextFetchDate = this.lastFetchDate ? moment(this.localStorageService.getSpotifySavedAlbums().fetchedDate).add(3, 'days') : null
+    this.nextFetchDate = this.lastFetchDate ? moment(this.localStorageService.getSpotifySavedAlbums().fetchedDate).add(1, 'days') : null
     this.albums = this.albumsInitial
 
     this.filterControl.valueChanges.pipe(debounceTime(200), distinctUntilChanged()).subscribe(() => {
@@ -82,7 +82,7 @@ export class SpotifyAlbumSortComponent {
   }
 
   get canRefetchLibrary(): boolean {
-    return !this.lastFetchDate || (this.lastFetchDate && moment().diff(this.lastFetchDate, 'days') >= 3)
+    return !this.lastFetchDate || (this.lastFetchDate && moment().diff(this.lastFetchDate, 'days') >= 1)
   }
 
   async fetchLibrary() {

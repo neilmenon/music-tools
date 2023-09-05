@@ -8,7 +8,7 @@
         <ng-template [ngIf]="user">
             • <a (click)="toggleListView()" class="action-link clickable"><i class="fas fa-toggle-{{ sortPref.listView ? 'on': 'off' }}"></i> List View</a> 
             • <a (click)="canRefetchLibrary && !fetchLoading ? fetchLibrary() : null" [ngClass]="{ 'action-link clickable': canRefetchLibrary, 'grayed-out': !canRefetchLibrary }"
-                [matTooltip]="canRefetchLibrary ? 'Re-fetch library now! This can be done once every 3 days.' : 'You may refetch your Spotify libray every 3 days. You can refetch your library in ' + moment.duration(nextFetchDate.diff(moment())).locale('en-US').humanize() + '.'"
+                [matTooltip]="canRefetchLibrary ? 'Re-fetch library now! This can be done once every 24 hours.' : 'You may refetch your Spotify libray every 24 hours. You can refetch your library in ' + moment.duration(nextFetchDate.diff(moment())).locale('en-US').humanize() + '.'"
                 >
                 <i class="fas fa-sync-alt {{ fetchLoading ? 'fa-spin' : '' }}"></i> {{ !fetchLoading && !canRefetchLibrary ? 'Fetch Spotify Library (' + moment.duration(nextFetchDate.diff(moment())).humanize() + ')' : (canRefetchLibrary && !fetchLoading ? 'Fetch Spotify Library' : 'Fetching...') }}
             </a>
