@@ -24,6 +24,9 @@ import { MatInputModule } from '@angular/material/input';
 import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { AnniversifyComponent } from './anniversify/anniversify.component';
+import { MatSelectModule } from '@angular/material/select';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 
 @NgModule({
@@ -33,13 +36,16 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
     ConnectSpotifyComponent,
     SpotifyAlbumSortComponent,
     AlbumSortPipe,
-    PluralizePipe
+    PluralizePipe,
+    AnniversifyComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     NoopAnimationsModule,
     MatButtonModule,
+    MatSelectModule,
+    MatProgressSpinnerModule,
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: !isDevMode(),
       // Register the ServiceWorker as soon as the application is stable

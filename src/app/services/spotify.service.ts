@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, delay, lastValueFrom, of, throwError } from 'rxjs';
 import { config } from '../config/config';
-import { SpotifyAlbumEntryModel, SpotifyAuthModel, SpotifyCustomAlbumPropModel, SpotifyLocalAlbumModel } from '../models/localStorageModel';
+import { MusicTool, SpotifyAlbumEntryModel, SpotifyAuthModel, SpotifyCustomAlbumPropModel, SpotifyLocalAlbumModel } from '../models/localStorageModel';
 import { SpotifyApiTokenModel } from '../models/spotifyApiModel';
 import { ErrorHandlerService } from './error-handler.service';
 import { LocalStorageService } from './local-storage.service';
@@ -26,12 +26,12 @@ export class SpotifyService {
     return this.localStorageService.getSpotifyAuthDetails() ? true : false
   }
 
-  redirectToAuthorizationPage() {
+  redirectToAuthorizationPage(tool: MusicTool) {
     let authParameters = {
       client_id: config.spotify.clientId,
       response_type: "code",
       redirect_uri: config.spotify.redirectUri,
-      scope: config.spotify.scope
+      scope: config.spotify.scopes[tool]
     }
 
     window.location.href = `https://accounts.spotify.com/authorize?${ new URLSearchParams(authParameters).toString() }`
@@ -57,18 +57,7 @@ export class SpotifyService {
       queryParamsHandling: 'merge'
     })
     
-    // fetch + persist user + saved albums object
-    this.messageService.open("Fetching Spotify user details...", "center", true)
-    let userDetails: SpotifyApi.UserObjectPublic = await this.getSpotifyUserDetails()
-    await this.spotifyLogin(userDetails)
-    this.messageService.open("Fetching albums saved in your Spotify library...", "center", true)
-    await this.getUserAlbums()
-    this.messageService.open("Fetch complete.")
-
-  }
-
-  async spotifyLogin(userDetails: SpotifyApi.UserObjectPublic): Promise<any> {
-    await lastValueFrom(this.http.post(config.spotify.userLoginUrl, userDetails).pipe(catchError(() => of({}))))
+    await this.getSpotifyUserDetails()
   }
 
   async getSpotifyUserDetails(): Promise<SpotifyApi.UserObjectPublic> {

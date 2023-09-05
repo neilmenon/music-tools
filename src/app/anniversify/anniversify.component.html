@@ -1,0 +1,85 @@
+<div class="center-all page-container">
+    <h1 class="page-title"><i class="fa fa-spotify"></i> Anniversify</h1>
+    <p>
+        Notifies you when an album in your Spotify Library has an anniversary.<br>
+        <a routerLink="" class="action-link"><i class="fa fa-home"></i> Back to App List</a> 
+        <br>
+    </p>
+    <app-connect-spotify [tool]="'anniversify'"></app-connect-spotify>
+    <mat-spinner *ngIf="loadingDetails" color="accent" [diameter]="50" style="margin: auto"></mat-spinner>
+    <ng-container *ngIf="user && !loadingDetails">
+        <div class="box center" style="overflow: unset;" *ngIf="anniversifyDetails">
+            <h2>Summary</h2>
+            <span style="color: #009688;"><i class="fas fa-check-circle"></i></span> Hey, {{ anniversifyDetails.name }}. Your Anniversify schedule is active!<br>
+            <span *ngIf="anniversifyDetails.lastRun">It last ran <span [matTooltip]="moment(anniversifyDetails.lastRun).format()" style="text-decoration: underline;">{{ moment(anniversifyDetails.lastRun).fromNow() }}</span>. </span>
+            <span *ngIf="!anniversifyDetails.lastRun">Your first run should occur within 24 hours. </span> 
+            <span *ngIf="anniversifyDetails.libraryLastFetched">Your Spotify library is updated weekly, last fetched <span [matTooltip]="moment(anniversifyDetails.libraryLastFetched).format()" style="text-decoration: underline;">{{ moment(anniversifyDetails.libraryLastFetched).fromNow() }}</span>.</span>
+            <span *ngIf="!anniversifyDetails.libraryLastFetched">Your Spotify library will be updated weekly.</span>
+            <span *ngIf="moment().diff(moment(anniversifyDetails.registerDate), 'days') <= 15"><br><hr>If you enabled email notifications, a welcome email was sent from <u>{{ emailSender }}</u>.<br><strong>Please check your spam/junk and make sure to WHITELIST this email so that you'll recieve notifications properly!</strong></span>
+            <ng-container *ngIf="showDeleteConfirmation">
+                <hr>
+                <span style="font-weight: bold;">Are you sure you want to stop Anniversify? If so, click the button below. You are always welcome to start notifications again at any time!</span>
+                <br><br>
+                <button mat-raised-button color="warn" (click)="deleteAnniversifyDetails()" *ngIf="!loadingDelete">
+                    <mat-icon>delete</mat-icon> Confirm
+                </button>
+                <mat-spinner *ngIf="loadingDelete" color="accent" [diameter]="25" style="margin: auto"></mat-spinner>
+            </ng-container>
+        </div>
+        <div class="box center" style="overflow: unset;" *ngIf="!anniversifyDetails">
+            <h2>Welcome</h2>
+            <span><span style="color: #e2e2e2;"><i class="fas fa-info-circle"></i></span> Thanks for checking out Anniversify! To start receiving notifications, fill out the form below and hit <strong>Start Anniversify</strong>.</span>
+        </div>
+        <div class="box center" style="overflow: unset;" *ngIf="anniversifyForm">
+            <form [formGroup]="anniversifyForm" id="anniversifyForm">
+                <div>
+                    <h2>Email Notifications</h2>
+                    <p>Whenever a release in your Spotify library has an anniversary, we'll send you a heads up via email!</p>
+                    <mat-checkbox formControlName="emailsEnabled">Enable email notifications</mat-checkbox>
+                    <mat-form-field *ngIf="anniversifyForm.controls['emailsEnabled'].value">
+                        <mat-label>Email address</mat-label>
+                        <input matInput formControlName="email">
+                    </mat-form-field>
+                </div>
+                <div>
+                    <h2>Spotify Playlist</h2>
+                    <p>
+                        We'll create and maintain a Spotify playlist with today's anniversaries. 
+                        <a *ngIf="anniversifyForm.controls['spotifyPlaylistId'].value" 
+                            href="https://open.spotify.com/playlist/{{ anniversifyForm.controls['spotifyPlaylistId'].value }}" 
+                            target="_blank"
+                        >
+                            Open your Spotify playlist
+                        </a>
+                    </p>
+                    <mat-checkbox formControlName="playlistEnabled">Enable Spotify playlist</mat-checkbox>
+                </div>
+                <div>
+                    <h2>Notification Settings</h2>
+                    <mat-checkbox formControlName="albumsOnly" matTooltip="Only be notified for albums in your library. Unfortunately, Spotify's API combines singles and EPs into the same category, so notifications for EPs cannot be enabled without also enabling singles notifications.">
+                        Exclude singles, EPs and compilation anniversaries
+                    </mat-checkbox>
+                    <h3>Notification Time</h3>
+                    <input type="time" formControlName="notifyTime" id="notifyTime" [class.field-error]="saveClicked && !anniversifyForm.controls['notifyTime'].valid"/>
+                    <br><br>
+                    <mat-form-field appearance="fill">
+                        <mat-label>Timezone</mat-label>
+                        <mat-select formControlName="timezone">
+                            <mat-option *ngFor="let timezone of timezones" [value]="timezone">{{ timezone }}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <button mat-raised-button color="primary" (click)="setAnniversifyDetails()" *ngIf="!loadingUpdate"
+                    [innerHtml]="">
+                    <mat-icon *ngIf="anniversifyDetails">save</mat-icon>
+                    <mat-icon *ngIf="!anniversifyDetails">start</mat-icon>
+                    {{ anniversifyDetails ? ' Update Settings' : ' Start Anniversify' }}
+                </button>
+                <button mat-raised-button color="warn" (click)="firstDeleteClicked()" *ngIf="!showDeleteConfirmation && anniversifyDetails && !loadingUpdate" style="margin-left: 1rem;">
+                    <mat-icon>delete</mat-icon> Stop Anniversify
+                </button>
+                <mat-spinner *ngIf="loadingUpdate" color="accent" [diameter]="25" style="margin: auto"></mat-spinner>
+            </form>
+        </div>
+    </ng-container>
+</div>

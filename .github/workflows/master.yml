@@ -45,7 +45,6 @@ jobs:
         run: |
           mkdir ./dist/music-tools/resources
           cp ./resources/spotify_auth.php ./dist/music-tools/resources/
-          cp ./resources/spotify_login.php ./dist/music-tools/resources/
           echo '<?php return array( "client_id" => "${{ secrets.SPOTIFY_CLIENT_ID }}", "client_secret" => "${{ secrets.SPOTIFY_CLIENT_SECRET }}", "redirect_uri" => "${{ secrets.SPOTIFY_REDIRECT_URI }}", "prod" => true, "log_file_location" => "${{ secrets.LOG_FILE_LOCATION }}" ); ?>' > ./dist/music-tools/resources/app-config.php
           
       - name: Copy files to server web root

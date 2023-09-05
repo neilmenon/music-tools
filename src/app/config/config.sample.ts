@@ -3,7 +3,13 @@ export const config = {
         clientId: "",
         authCodeUrl: "http://localhost:9000/resources/spotify_auth.php",
         redirectUri: "http://localhost:4200",
-        scope: "user-library-read user-read-email",
-        userLoginUrl: "http://localhost:9000/resources/spotify_login.php"
-    }
+        scopes: {
+            librarySort: "user-library-read user-read-email",
+            anniversify: "user-library-read ugc-image-upload playlist-modify-public playlist-modify-private"
+        },
+    },
+    anniversify: {
+        apiRoot: "",
+        emailSender: ""
+    },
 }

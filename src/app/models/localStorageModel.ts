@@ -46,3 +46,5 @@ export class UserPreferenceSpotifySortModel {
         this.listView = false
     }
 }
+
+export type MusicTool = "librarySort" | "anniversify"
