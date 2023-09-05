@@ -25,6 +25,7 @@ export class AnniversifyComponent implements OnInit {
   loadingDelete: boolean
   moment = moment
   emailSender = config.anniversify.emailSender
+  needsMoreScopes: boolean
 
   constructor(
     private localStorageService: LocalStorageService,
@@ -46,7 +47,7 @@ export class AnniversifyComponent implements OnInit {
       this.anniversifyForm.controls['email'].updateValueAndValidity()
     })
 
-    if (this.user) {
+    if (this.user && !this.needsMoreScopes) {
       this.loadingDetails = true
       this.anniversifyService.getDetails().then(details => {
         this.loadingDetails = false
@@ -133,5 +134,9 @@ export class AnniversifyComponent implements OnInit {
 
   get user(): SpotifyApi.UserObjectPublic { 
     return this.localStorageService.getSpotifyUserDetails()
+  }
+
+  updateNeedMoreScopes(event: boolean) {
+    this.needsMoreScopes = event
   }
 }

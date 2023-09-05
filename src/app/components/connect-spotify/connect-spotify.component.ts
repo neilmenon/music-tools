@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { config } from 'src/app/config/config';
 import { MusicTool, SpotifyAuthModel, UserPreferenceModel } from 'src/app/models/localStorageModel';
 import { SpotifyApiTokenModel } from 'src/app/models/spotifyApiModel';
@@ -14,6 +14,7 @@ import { SpotifyService } from 'src/app/services/spotify.service';
 export class ConnectSpotifyComponent implements OnInit {
   @Input() showConnectButton: boolean = true
   @Input() tool: MusicTool
+  @Output() needMoreScopesEmitter = new EventEmitter<boolean>(true)
   userPref: UserPreferenceModel
   needMoreScopes: boolean
 
@@ -35,6 +36,7 @@ export class ConnectSpotifyComponent implements OnInit {
         let neededScopes: string[] = config.spotify.scopes[this.tool].split(" ")
         if (!neededScopes.every(x => currentScopes.includes(x))) {
           this.needMoreScopes = true
+          this.needMoreScopesEmitter.emit(this.needMoreScopes)
         }
       }
     }

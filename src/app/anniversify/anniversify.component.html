@@ -5,9 +5,9 @@
         <a routerLink="" class="action-link"><i class="fa fa-home"></i> Back to App List</a> 
         <br>
     </p>
-    <app-connect-spotify [tool]="'anniversify'"></app-connect-spotify>
-    <mat-spinner *ngIf="loadingDetails" color="accent" [diameter]="50" style="margin: auto"></mat-spinner>
-    <ng-container *ngIf="user && !loadingDetails">
+    <app-connect-spotify [tool]="'anniversify'" (needMoreScopesEmitter)="updateNeedMoreScopes($event)"></app-connect-spotify>
+    <mat-spinner *ngIf="loadingDetails && !needsMoreScopes" color="accent" [diameter]="50" style="margin: auto"></mat-spinner>
+    <ng-container *ngIf="user && !loadingDetails && !needsMoreScopes">
         <div class="box center" style="overflow: unset;" *ngIf="anniversifyDetails">
             <h2>Summary</h2>
             <span style="color: #009688;"><i class="fas fa-check-circle"></i></span> Hey, {{ anniversifyDetails.name }}. Your Anniversify schedule is active!<br>
