@@ -73,16 +73,18 @@
                         </mat-select>
                     </mat-form-field>
                 </div>
-                <button mat-raised-button color="primary" (click)="setAnniversifyDetails()" *ngIf="!loadingUpdate"
-                    [innerHtml]="">
-                    <mat-icon *ngIf="anniversifyDetails">save</mat-icon>
-                    <mat-icon *ngIf="!anniversifyDetails">start</mat-icon>
-                    {{ anniversifyDetails ? ' Update Settings' : ' Start Anniversify' }}
-                </button>
-                <button mat-raised-button color="warn" (click)="firstDeleteClicked()" *ngIf="!showDeleteConfirmation && anniversifyDetails && !loadingUpdate" style="margin-left: 1rem;">
-                    <mat-icon>delete</mat-icon> Stop Anniversify
-                </button>
-                <mat-spinner *ngIf="loadingUpdate" color="accent" [diameter]="25" style="margin: auto"></mat-spinner>
+                <div class="multi-button-container">
+                    <button mat-raised-button color="primary" (click)="setAnniversifyDetails()" *ngIf="!loadingUpdate"
+                        [innerHtml]="">
+                        <mat-icon *ngIf="anniversifyDetails">save</mat-icon>
+                        <mat-icon *ngIf="!anniversifyDetails">start</mat-icon>
+                        {{ anniversifyDetails ? ' Update Settings' : ' Start Anniversify' }}
+                    </button>
+                    <button mat-raised-button color="warn" (click)="firstDeleteClicked()" *ngIf="!showDeleteConfirmation && anniversifyDetails && !loadingUpdate">
+                        <mat-icon>delete</mat-icon> Stop Anniversify
+                    </button>
+                    <mat-spinner *ngIf="loadingUpdate" color="accent" [diameter]="25" style="margin: auto"></mat-spinner>
+                </div>
             </form>
         </div>
     </ng-container>
