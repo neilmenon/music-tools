@@ -11,7 +11,7 @@ if(isset($_GET["code"])) { // return the auth details
     curl_setopt($ch, CURLOPT_URL, "https://accounts.spotify.com/api/token");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-    curl_setopt($ch, CURLOPT_POSTFIELDS, "grant_type=authorization_code&redirect_uri=" . $configs['redirect_uri'] . "&code=" . $_GET["code"]); 
+    curl_setopt($ch, CURLOPT_POSTFIELDS, "grant_type=authorization_code&redirect_uri=" . $configs['redirect_uri'] . "/" . $_GET["tool"] . "&code=" . $_GET["code"]); 
     curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: Basic " . base64_encode($configs['client_id'] . ":" . $configs['client_secret']))); 
 
     if ($configs['prod'] == false) {

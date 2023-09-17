@@ -47,4 +47,4 @@ export class UserPreferenceSpotifySortModel {
     }
 }
 
-export type MusicTool = "librarySort" | "anniversify"
+export type MusicTool = "spotify-album-sort" | "anniversify"

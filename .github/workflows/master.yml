@@ -34,7 +34,7 @@ jobs:
           
       - name: Create config.ts file
         run: |
-          echo 'export const config = { spotify: { clientId: "${{ secrets.SPOTIFY_CLIENT_ID }}", authCodeUrl: "${{ secrets.AUTH_CODE_URL }}", redirectUri: "${{ secrets.SPOTIFY_REDIRECT_URI }}", scopes: { librarySort: "${{ secrets.SPOTIFY_SCOPES_LIBRARY_SORT }}", anniversify: "${{ secrets.SPOTIFY_SCOPES_ANNIVERSIFY }}" }, }, anniversify: { apiRoot: "${{ secrets.ANNIVERSIFY_API_ROOT }}", emailSender: "${{ secrets.ANNIVERSIFY_EMAIL_SENDER }}" }, }' > ./src/app/config/config.ts
+          echo 'export const config = { spotify: { clientId: "${{ secrets.SPOTIFY_CLIENT_ID }}", authCodeUrl: "${{ secrets.AUTH_CODE_URL }}", redirectUri: "${{ secrets.SPOTIFY_REDIRECT_URI }}", scopes: { "spotify-album-sort": "${{ secrets.SPOTIFY_SCOPES_LIBRARY_SORT }}", anniversify: "${{ secrets.SPOTIFY_SCOPES_ANNIVERSIFY }}" }, }, anniversify: { apiRoot: "${{ secrets.ANNIVERSIFY_API_ROOT }}", emailSender: "${{ secrets.ANNIVERSIFY_EMAIL_SENDER }}" }, }' > ./src/app/config/config.ts
           
       - name: npm install and ng build
         run: |

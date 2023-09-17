@@ -30,16 +30,16 @@ export class SpotifyService {
     let authParameters = {
       client_id: config.spotify.clientId,
       response_type: "code",
-      redirect_uri: config.spotify.redirectUri,
+      redirect_uri: `${ config.spotify.redirectUri }/${ tool }`,
       scope: config.spotify.scopes[tool]
     }
 
     window.location.href = `https://accounts.spotify.com/authorize?${ new URLSearchParams(authParameters).toString() }`
   }
 
-  async getAuthTokensFromCode(code: string) {
+  async getAuthTokensFromCode(code: string, tool: MusicTool) {
     let authResponse: SpotifyApiTokenModel = await lastValueFrom(
-      this.http.get<SpotifyApiTokenModel>(config.spotify.authCodeUrl + `?code=${ code }`).pipe(
+      this.http.get<SpotifyApiTokenModel>(config.spotify.authCodeUrl + `?code=${ code }&tool=${ tool }`).pipe(
         catchError((err: HttpErrorResponse) => {
           this.messageService.open("Error authenticating with Spotify!" + this.errorService.getHttpErrorMessage(err))
           return throwError(() => err)
@@ -57,7 +57,9 @@ export class SpotifyService {
       queryParamsHandling: 'merge'
     })
     
+    this.messageService.open("Fetching Spotify user details...", "center", true)
     await this.getSpotifyUserDetails()
+    window.location.reload()
   }
 
   async getSpotifyUserDetails(): Promise<SpotifyApi.UserObjectPublic> {
