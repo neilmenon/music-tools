@@ -6,8 +6,20 @@ import { AnniversifyComponent } from './anniversify/anniversify.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
-  { path: 'spotify-album-sort', component: SpotifyAlbumSortComponent },
-  { path: 'anniversify', component: AnniversifyComponent },
+  { 
+    path: 'spotify-album-sort', component: SpotifyAlbumSortComponent,
+    data: {
+      title: 'Spotify Library Album Sort',
+      description: 'Provides some more ways to sort albums in your Spotify library.',
+    }
+  },
+  { 
+    path: 'anniversify', component: AnniversifyComponent,
+    data: {
+      title: 'Spotify Library Album Sort',
+      description: 'Notifies you when an album in your Spotify Library has an anniversary.',
+    }
+  },
 ];
 
 @NgModule({
