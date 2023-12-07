@@ -67,10 +67,10 @@ hr {
     color: rgb(226, 226, 226);
 }
 
-.mat-flat-button.mat-primary, .mat-raised-button.mat-primary, .mat-fab.mat-primary, .mat-mini-fab.mat-primary, .primary {
+.mat-mdc-unelevated-button.mat-primary, .mat-mdc-raised-button.mat-primary, .mat-mdc-fab.mat-primary, .mat-mdc-mini-fab.mat-primary, .primary {
     background-color: #ba0000;
 }
-.mat-flat-button.mat-warn, .mat-raised-button.mat-warn, .mat-fab.mat-warn, .mat-mini-fab.mat-warn, .warn {
+.mat-mdc-unelevated-button.mat-warn, .mat-mdc-raised-button.mat-warn, .mat-mdc-fab.mat-warn, .mat-mdc-mini-fab.mat-warn, .warn {
     background-color: #716340;
 }
 .clickable {
@@ -286,6 +286,7 @@ div > mat-chip-option:not(:last-child), mat-chip:not(:last-child) {
     left: 0.6rem;
 }
 
+/* TODO(mdc-migration): The following rule targets internal classes of chips that may no longer apply for the MDC version. */
 .mat-chip-compact {
     height: 21px!important;
 }
