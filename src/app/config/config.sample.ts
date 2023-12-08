@@ -10,6 +10,7 @@ export const config = {
     },
     anniversify: {
         apiRoot: "",
-        emailSender: ""
+        emailSender: "",
+        vapidPublicKey: "",
     },
 }

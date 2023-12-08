@@ -8,6 +8,8 @@ import { timezones } from '../constants/timezones';
 import { MessageService } from '../services/message.service';
 import * as moment from 'moment';
 import { config } from '../config/config';
+import { SwPush } from '@angular/service-worker';
+import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 
 @Component({
   selector: 'app-anniversify',
@@ -26,12 +28,14 @@ export class AnniversifyComponent implements OnInit {
   moment = moment
   emailSender = config.anniversify.emailSender
   needsMoreScopes: boolean
+  subscriptionObject: string = `${(window.navigator as any)?.standalone}`
 
   constructor(
     private localStorageService: LocalStorageService,
     private anniversifyService: AnniversifyService,
     private fb: UntypedFormBuilder,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private swPush: SwPush
   ) {
     
   }
@@ -138,5 +142,26 @@ export class AnniversifyComponent implements OnInit {
 
   updateNeedMoreScopes(event: boolean) {
     this.needsMoreScopes = event
+  }
+
+  togglePushNotifications(event: MatSlideToggleChange) {
+    if (event.checked) {
+      this.swPush.requestSubscription({ serverPublicKey: config.anniversify.vapidPublicKey })
+        .then(sub => { 
+          console.log(sub.toJSON()) 
+          this.subscriptionObject = JSON.stringify(sub.toJSON())
+        })
+        .catch(err => {
+          this.messageService.open("There was an error while requesting push notification permissions. Did you disable permissions on your device for this app? Please try again")
+          console.error(err)
+        })
+    } else {
+
+    }
+  }
+
+  canEnablePushNotifications(): boolean {
+    // return (window.navigator as any)?.standalone
+    return true
   }
 }
