@@ -27,7 +27,7 @@ export class HomeComponent implements OnInit {
       this.router.navigate([], {
         queryParams: { 'redirectToSpotifyPlaylistId': null },
         queryParamsHandling: 'merge'
-      }).then(() => window.location.href = `spotify://https://open.spotify.com/playlist/${params['redirectToSpotifyPlaylistId']}`)
+      }).then(() => window.open(`https://open.spotify.com/playlist/${params['redirectToSpotifyPlaylistId']}`))
     }
   }
 }
