@@ -24,7 +24,14 @@ export class MessageService {
       this.snackBar.open(message, "Update", {
         horizontalPosition: this.positions[position],
         duration: 0
-      }).onAction().subscribe(() => window.location.reload())
+      }).onAction().subscribe(() => {
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistrations().then(function(registrations) {
+            registrations.map(r => { r.unregister() })
+            window.location.reload()
+           })
+        }
+      })
     } else {
       if (persistent) {
         this.snackBar.open(message, undefined, {

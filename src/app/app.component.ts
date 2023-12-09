@@ -15,7 +15,7 @@ export class AppComponent {
       swUpdate.versionUpdates.subscribe((update) => {
         switch (update.type) {
           case 'VERSION_READY':
-            this.messageService.open("New app version is available! Restart/reload to update.", "center", true)
+            this.messageService.open("New app version is available!", "center", true)
             break
           case 'VERSION_INSTALLATION_FAILED':
             // this.messageService.open(`Failed to install app version`)
