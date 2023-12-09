@@ -165,7 +165,8 @@ export class AnniversifyComponent implements OnInit {
   }
 
   canEnablePushNotifications(): boolean {
-    return (window.navigator as any)?.standalone && this.isIOSVersionAtLeast(16, 4)
+    return config.spotify.redirectUri.includes('localhost') ? true :
+     (window.navigator as any)?.standalone && this.isIOSVersionAtLeast(16, 4)
     // return true
   }
 

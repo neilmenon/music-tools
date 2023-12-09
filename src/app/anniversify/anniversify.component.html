@@ -34,7 +34,7 @@
             <form [formGroup]="anniversifyForm" id="anniversifyForm">
                 <div>
                     <h2>Email Notifications</h2>
-                    <p>Whenever a release in your Spotify library has an anniversary, we'll send you a heads up via email!</p>
+                    <p>Whenever a release in your Spotify library has an anniversary, we'll send you a heads up via email.</p>
                     <mat-slide-toggle formControlName="emailsEnabled">Email notifications</mat-slide-toggle>
                     <mat-form-field *ngIf="anniversifyForm.controls['emailsEnabled'].value" style="padding-top: 0.25rem;" appearance="outline" color="accent">
                         <mat-label>Email address</mat-label>

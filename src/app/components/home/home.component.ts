@@ -15,10 +15,19 @@ export class HomeComponent implements OnInit {
   constructor(
     public spotifyService: SpotifyService,
     private messageService: MessageService,
-    private localStorageService: LocalStorageService
+    private localStorageService: LocalStorageService,
+    private router: Router,
   ) { }
 
   ngOnInit(): void {
     this.user = this.localStorageService.getSpotifyUserDetails()
+    const params = Object.fromEntries(new URLSearchParams(window.location.search).entries());
+    if (params['redirectToSpotifyPlaylistId']) { // finish the authentication
+      // this.messageService.open("Connecting Spotify....", "center", true)
+      this.router.navigate([], {
+        queryParams: { 'redirectToSpotifyPlaylistId': null },
+        queryParamsHandling: 'merge'
+      }).then(() => window.location.href = `spotify://https://open.spotify.com/playlist/${params['redirectToSpotifyPlaylistId']}`)
+    }
   }
 }
