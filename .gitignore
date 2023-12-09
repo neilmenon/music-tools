@@ -47,3 +47,5 @@ app-config.php
 nmt.log
 cert.pem
 key.pem
+
+test-files/

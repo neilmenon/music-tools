@@ -359,3 +359,7 @@ table > tbody > tr:nth-child(odd) {
 .multi-button-container > button{
     margin: 0.25rem
 }
+
+mat-slide-toggle {
+    padding: 0.25rem 0;
+}

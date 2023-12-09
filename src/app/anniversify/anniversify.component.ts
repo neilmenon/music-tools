@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { LocalStorageService } from '../services/local-storage.service';
 import { AnniversifyService } from '../services/anniversify.service';
-import { AnniversifyModel } from '../models/anniversifyModel';
+import { AnniversifyModel, PushNotificationObject } from '../models/anniversifyModel';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { timezones } from '../constants/timezones';
@@ -28,7 +28,6 @@ export class AnniversifyComponent implements OnInit {
   moment = moment
   emailSender = config.anniversify.emailSender
   needsMoreScopes: boolean
-  subscriptionObject: string = `${(window.navigator as any)?.standalone}`
 
   constructor(
     private localStorageService: LocalStorageService,
@@ -127,6 +126,7 @@ export class AnniversifyComponent implements OnInit {
       name: [null],
       libraryLastFetched: [null],
       notifyTime: [null, Validators.compose([Validators.required])],
+      pushNotificationObject: [null],
     })
   }
 
@@ -149,19 +149,22 @@ export class AnniversifyComponent implements OnInit {
       this.swPush.requestSubscription({ serverPublicKey: config.anniversify.vapidPublicKey })
         .then(sub => { 
           console.log(sub.toJSON()) 
-          this.subscriptionObject = JSON.stringify(sub.toJSON())
+          let pushNotificationObject: PushNotificationObject = new PushNotificationObject()
+          pushNotificationObject.subscription = JSON.parse(JSON.stringify(sub.toJSON()))
+          this.anniversifyForm.controls['pushNotificationObject'].setValue(pushNotificationObject)
+          this.messageService.open("Notification permission granted. Save your settings to enable notifications!")
         })
         .catch(err => {
-          this.messageService.open("There was an error while requesting push notification permissions. Did you disable permissions on your device for this app? Please try again")
+          this.messageService.open("There was an error while requesting push notification permissions. Did you disable permissions on your device for this app? Please try again.")
           console.error(err)
         })
     } else {
-
+      this.anniversifyForm.controls['pushNotificationObject'].setValue(null)
     }
   }
 
   canEnablePushNotifications(): boolean {
-    // return (window.navigator as any)?.standalone
-    return true
+    return (window.navigator as any)?.standalone
+    // return true
   }
 }

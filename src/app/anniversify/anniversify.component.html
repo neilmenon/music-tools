@@ -15,7 +15,7 @@
             <span *ngIf="!anniversifyDetails.lastRun">Your first run should occur within 24 hours. </span> 
             <span *ngIf="anniversifyDetails.libraryLastFetched">Your Spotify library is updated weekly, last fetched <span [matTooltip]="moment(anniversifyDetails.libraryLastFetched).format()" style="text-decoration: underline;">{{ moment(anniversifyDetails.libraryLastFetched).locale('en-US').fromNow() }}</span>.</span>
             <span *ngIf="!anniversifyDetails.libraryLastFetched">Your Spotify library will be updated weekly.</span>
-            <span *ngIf="moment().diff(moment(anniversifyDetails.registerDate), 'days') <= 15"><br><hr>If you enabled email notifications, a welcome email was sent from <u>{{ emailSender }}</u>.<br><strong>Please check your spam/junk and make sure to WHITELIST this email so that you'll recieve notifications properly!</strong></span>
+            <span *ngIf="moment().diff(moment(anniversifyDetails.registerDate), 'days') <= 3"><br><hr>If you enabled email notifications, a welcome email was sent from <u>{{ emailSender }}</u>.<br><strong>Please check your spam/junk and make sure to WHITELIST this email so that you'll recieve notifications properly!</strong></span>
             <ng-container *ngIf="showDeleteConfirmation">
                 <hr>
                 <span style="font-weight: bold;">Are you sure you want to stop Anniversify? If so, click the button below. You are always welcome to start notifications again at any time!</span>
@@ -35,18 +35,16 @@
                 <div>
                     <h2>Email Notifications</h2>
                     <p>Whenever a release in your Spotify library has an anniversary, we'll send you a heads up via email!</p>
-                    <mat-checkbox formControlName="emailsEnabled">Enable email notifications</mat-checkbox>
-                    <mat-form-field *ngIf="anniversifyForm.controls['emailsEnabled'].value">
+                    <mat-slide-toggle formControlName="emailsEnabled">Email notifications</mat-slide-toggle>
+                    <mat-form-field *ngIf="anniversifyForm.controls['emailsEnabled'].value" style="padding-top: 0.25rem;" appearance="outline" color="accent">
                         <mat-label>Email address</mat-label>
                         <input matInput formControlName="email">
                     </mat-form-field>
                 </div>
-                <div *ngIf="anniversifyDetails.spotifyPlaylistId == '4hVccKMMxOmDXLNyldXu6z'">
+                <div>
                     <h2>Push Notifications (iOS Only)</h2>
-                    <p>Requires iOS 16.4 or later and the app added to your home screen. Receive a push notification on this device.</p>
-                    <mat-slide-toggle color="accent" [disabled]="!canEnablePushNotifications()" (change)="togglePushNotifications($event)">Push Notifications</mat-slide-toggle>
-                    <br>
-                    <input type="text" [value]="subscriptionObject">
+                    <p>Requires iOS 16.4 or later and the app added to your home screen. Receive a push notification on this device when you have an anniversary.</p>
+                    <mat-slide-toggle color="accent" [disabled]="!canEnablePushNotifications()" (change)="togglePushNotifications($event)" [checked]="anniversifyForm.controls['pushNotificationObject'].value">Push notifications</mat-slide-toggle>
                 </div>
                 <div>
                     <h2>Spotify Playlist</h2>
@@ -59,13 +57,13 @@
                             Open your Spotify playlist
                         </a>
                     </p>
-                    <mat-checkbox formControlName="playlistEnabled">Enable Spotify playlist</mat-checkbox>
+                    <mat-slide-toggle formControlName="playlistEnabled">Spotify playlist</mat-slide-toggle>
                 </div>
                 <div>
                     <h2>Notification Settings</h2>
-                    <mat-checkbox formControlName="albumsOnly">
+                    <mat-slide-toggle formControlName="albumsOnly">
                         Exclude singles, EPs and compilation anniversaries
-                    </mat-checkbox>
+                    </mat-slide-toggle>
                     <p>
                         Only be notified for albums in your library. Recommended if you save a lot of non-albums to your library. Spotify's API combines singles and EPs into the same category, so notifications for EPs cannot be enabled without also enabling singles notifications.
                     </p>
@@ -73,7 +71,7 @@
                     <p style="padding-bottom: 0.25rem;">Choose the time that works best for you. Morning listener? Set it a couple hours before you wake up. Listen to music after work? Choose a time in the evening!</p>
                     <input type="time" formControlName="notifyTime" id="notifyTime" [class.field-error]="saveClicked && !anniversifyForm.controls['notifyTime'].valid"/>
                     <br><br>
-                    <mat-form-field appearance="fill">
+                    <mat-form-field appearance="outline" color="accent">
                         <mat-label>Timezone</mat-label>
                         <mat-select formControlName="timezone">
                             <mat-option *ngFor="let timezone of timezones" [value]="timezone">{{ timezone }}</mat-option>
@@ -93,6 +91,7 @@
                     <mat-spinner *ngIf="loadingUpdate" color="accent" [diameter]="25" style="margin: auto"></mat-spinner>
                 </div>
             </form>
+            <!-- <div id="unsavedChanges" [style.opacity]="anniversifyForm.dirty ? '1' : '0'"><mat-icon [inline]="true" style="display: inline;">edit</mat-icon> Made changes? Make sure you save!</div> -->
         </div>
     </ng-container>
 </div>

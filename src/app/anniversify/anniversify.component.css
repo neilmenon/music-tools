@@ -38,3 +38,13 @@ label {
 .field-error {
     background: #F44336;
 }
+#unsavedChanges {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    background: #577a9c;
+    color: #fff;
+    transition: 0.5s;
+    z-index: 1;
+}

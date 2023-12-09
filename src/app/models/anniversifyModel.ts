@@ -1,3 +1,5 @@
+import * as moment from "moment"
+
 export class AnniversifyModel {
     lastAuthenticated: string
     albumsOnly: boolean
@@ -12,6 +14,7 @@ export class AnniversifyModel {
     libraryLastFetched: string
     notifyTime: string
     registerDate: string
+    pushNotificationObject: PushNotificationObject
 
     constructor() {
         this.lastAuthenticated = null
@@ -27,5 +30,18 @@ export class AnniversifyModel {
         this.libraryLastFetched = null
         this.notifyTime = null
         this.registerDate = null
+        this.pushNotificationObject = null
+    }
+}
+
+export class PushNotificationObject {
+    userAgent: string
+    dateEnabled: string
+    subscription: any
+
+    constructor() {
+        this.userAgent = navigator.userAgent
+        this.dateEnabled = moment().format()
+        this.subscription = null
     }
 }

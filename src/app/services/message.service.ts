@@ -20,16 +20,23 @@ export class MessageService {
   }
 
   open(message: string, position = "center", persistent: boolean = false) {
-    if (persistent) {
-      this.snackBar.open(message, undefined, {
+    if (message.toLowerCase().includes("app version")) {
+      this.snackBar.open(message, "Update", {
         horizontalPosition: this.positions[position],
         duration: 0
-      })
+      }).onAction().subscribe(() => window.location.reload())
     } else {
-      this.snackBar.open(message, "Dismiss", {
-        horizontalPosition: this.positions[position],
-        duration: 5000
-      })
+      if (persistent) {
+        this.snackBar.open(message, undefined, {
+          horizontalPosition: this.positions[position],
+          duration: 0
+        })
+      } else {
+        this.snackBar.open(message, "Dismiss", {
+          horizontalPosition: this.positions[position],
+          duration: 5000
+        })
+      }
     }
   }
 
