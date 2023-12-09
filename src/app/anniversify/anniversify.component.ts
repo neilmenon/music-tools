@@ -155,7 +155,8 @@ export class AnniversifyComponent implements OnInit {
           this.messageService.open("Notification permission granted. Save your settings to enable notifications!")
         })
         .catch(err => {
-          this.messageService.open("There was an error while requesting push notification permissions. Did you disable permissions on your device for this app? Please try again.")
+          this.messageService.open("Error while requesting push notification permissions. Did you disable permissions If so, go to Settings > Notifications, find N.M.T, and toggle Allow Notifications, and restart this app..")
+          this.anniversifyForm.controls['pushNotificationObject'].setValue(null)
           console.error(err)
         })
     } else {
