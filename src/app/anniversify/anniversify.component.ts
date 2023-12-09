@@ -165,7 +165,27 @@ export class AnniversifyComponent implements OnInit {
   }
 
   canEnablePushNotifications(): boolean {
-    return (window.navigator as any)?.standalone
+    return (window.navigator as any)?.standalone && this.isIOSVersionAtLeast(16, 4)
     // return true
+  }
+
+  isIOSVersionAtLeast(requiredMajor: number, requiredMinor: number): boolean {
+    const userAgent = window.navigator.userAgent;
+    
+    // Check if the user agent contains information about iOS
+    if (/iPad|iPhone|iPod/.test(userAgent) && !(window as any)?.MSStream) {
+      // Extract the iOS version using a regular expression
+      const match = userAgent.match(/OS (\d+)_(\d+)_?(\d+)?/);
+  
+      if (match) {
+        const majorVersion = parseInt(match[1], 10);
+        const minorVersion = match[2] ? parseInt(match[2], 10) : 0;
+        
+        // Check if the version is equal to or greater than the required version
+        return majorVersion > requiredMajor || (majorVersion === requiredMajor && minorVersion >= requiredMinor);
+      }
+    }
+  
+    return false; // Return false for non-iOS devices or if the version information cannot be determined
   }
 }
