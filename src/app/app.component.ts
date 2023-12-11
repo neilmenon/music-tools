@@ -9,7 +9,7 @@ import { MessageService } from './services/message.service';
 })
 export class AppComponent {
   title = 'music-tools';
-  isStandalone: boolean
+  isStandalone: boolean = (navigator as any)?.standalone
   isIOSSafari = this.getIOSSafari()
 
   constructor(private swUpdate: SwUpdate, private messageService: MessageService) {
@@ -32,7 +32,7 @@ export class AppComponent {
 
   get showAddToHomescreen(): boolean {
     // return localStorage.getItem("dismissAddToHomescreen") != "true"
-    return this.isStandalone &&
+    return !this.isStandalone &&
       this.isIOSSafari &&
       localStorage.getItem("dismissAddToHomescreen") != "true"
   }
