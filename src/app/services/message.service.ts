@@ -27,7 +27,7 @@ export class MessageService {
       }).onAction().subscribe(() => {
         if ('serviceWorker' in navigator) {
           navigator.serviceWorker.getRegistrations().then(function(registrations) {
-            registrations.map(r => { r.update() })
+            // registrations.map(r => { r.update() })
             window.location.reload()
            })
           localStorage.setItem("dismissAddToHomescreen", "false")

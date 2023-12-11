@@ -44,7 +44,7 @@
                 <div>
                     <h2>Push Notifications (iOS Only)</h2>
                     <p>
-                        Requires iOS 16.4 or later and the app added to your home screen. Receive a push notification on this device when you have an anniversary.
+                        Requires iOS 16.4 or later and the app added to your home screen from Safari. Receive a push notification on this device when you have an anniversary.
                         <span *ngIf="dismissedAddToHomeScreen()" class="action-link clickable" (click)="showHomescreenInstructions()"><br>Show Instructions</span>
                     </p>
                     <mat-slide-toggle color="accent" [disabled]="!canEnablePushNotifications()" (change)="togglePushNotifications($event)" [checked]="anniversifyForm.controls['pushNotificationObject'].value">Push notifications</mat-slide-toggle>
