@@ -28,6 +28,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { AnniversifyReportComponent } from './components/anniversify/anniversify-report/anniversify-report.component';
+import { AddToHomescreenComponent } from './components/add-to-homescreen/add-to-homescreen.component';
 
 
 
@@ -40,7 +41,8 @@ import { AnniversifyReportComponent } from './components/anniversify/anniversify
     AlbumSortPipe,
     PluralizePipe,
     AnniversifyComponent,
-    AnniversifyReportComponent
+    AnniversifyReportComponent,
+    AddToHomescreenComponent
   ],
   imports: [
     BrowserModule,

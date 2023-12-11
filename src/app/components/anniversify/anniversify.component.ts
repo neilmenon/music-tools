@@ -193,4 +193,12 @@ export class AnniversifyComponent implements OnInit {
   
     return false; // Return false for non-iOS devices or if the version information cannot be determined
   }
+
+  dismissedAddToHomeScreen() {
+    return localStorage.getItem("dismissAddToHomescreen") == "true"
+  }
+
+  showHomescreenInstructions() {
+    localStorage.setItem("dismissAddToHomescreen", "false")
+  }
 }

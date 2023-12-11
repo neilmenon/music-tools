@@ -9,6 +9,8 @@ import { MessageService } from './services/message.service';
 })
 export class AppComponent {
   title = 'music-tools';
+  isStandalone: boolean
+  isIOSSafari = this.getIOSSafari()
 
   constructor(private swUpdate: SwUpdate, private messageService: MessageService) {
     if (this.swUpdate.isEnabled) {
@@ -25,5 +27,21 @@ export class AppComponent {
     } else {
       console.warn("swUpdate not enabled")
     }
+
+  }
+
+  get showAddToHomescreen(): boolean {
+    // return localStorage.getItem("dismissAddToHomescreen") != "true"
+    return this.isStandalone &&
+      this.isIOSSafari &&
+      localStorage.getItem("dismissAddToHomescreen") != "true"
+  }
+
+  getIOSSafari(): boolean {
+    const userAgent = navigator.userAgent;
+    const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !(window as any).MSStream;
+    const isSafari = /^((?!Chrome|Android).)*Safari/.test(userAgent);
+
+    return isIOS && isSafari;
   }
 }

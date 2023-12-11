@@ -30,6 +30,7 @@ export class MessageService {
             registrations.map(r => { r.update() })
             window.location.reload()
            })
+          localStorage.setItem("dismissAddToHomescreen", "false")
         }
       })
     } else {
