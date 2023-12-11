@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { LocalStorageService } from '../services/local-storage.service';
-import { AnniversifyService } from '../services/anniversify.service';
-import { AnniversifyModel, PushNotificationObject } from '../models/anniversifyModel';
+import { LocalStorageService } from '../../services/local-storage.service';
+import { AnniversifyService } from '../../services/anniversify.service';
+import { AnniversifyModel, PushNotificationObject } from '../../models/anniversifyModel';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
-import { timezones } from '../constants/timezones';
-import { MessageService } from '../services/message.service';
+import { timezones } from '../../constants/timezones';
+import { MessageService } from '../../services/message.service';
 import * as moment from 'moment';
-import { config } from '../config/config';
+import { config } from '../../config/config';
 import { SwPush } from '@angular/service-worker';
 import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 
@@ -67,7 +67,11 @@ export class AnniversifyComponent implements OnInit {
   setAnniversifyDetails() {
     this.saveClicked = true
     if (!this.anniversifyForm.controls['playlistEnabled'].value && !this.anniversifyForm.controls['emailsEnabled'].value) {
-      this.messageService.open("Either email or playlist notification method must be enabled to save!")
+      this.messageService.open("Either email or playlist  must be enabled to save!")
+      return
+    }
+    if (!this.anniversifyForm.controls['playlistEnabled'].value && this.anniversifyForm.controls['pushNotificationObject'].value) {
+      this.messageService.open("Spotify playlist must be enabled for push notifications (so I can take you there).")
       return
     }
     if (this.anniversifyForm.valid) {

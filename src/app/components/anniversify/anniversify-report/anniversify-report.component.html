@@ -1,0 +1,15 @@
+<div class="center-all page-container">
+    <h1 class="page-title"><i class="fa fa-spotify"></i> Anniversify</h1>
+    <p>
+        Notifies you when an album in your Spotify Library has an anniversary.<br>
+        <a routerLink="" class="action-link"><i class="fa fa-home"></i> Back to App List</a> 
+         • <a routerLink="/anniversify" class="action-link"><i class="fa fa-birthday-cake"></i> Back to Anniversify</a> 
+    </p>
+    <div class="box" style="padding: 15px;margin-top: 2rem;">
+        <span>{{ numReleases | pluralize:'release'}} from your library came out today, {{ date }}. Time to celebrate 🎉</span>
+        <br><br>
+        <a mat-raised-button color="accent" href="https://open.spotify.com/playlist/{{ playlistId }}" target="_blank" class="spotify-button">
+            Open Spotify Playlist
+        </a>
+    </div>
+</div>

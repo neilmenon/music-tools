@@ -23,10 +23,11 @@ import { MatInputModule } from '@angular/material/input';
 import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { AnniversifyComponent } from './anniversify/anniversify.component';
+import { AnniversifyComponent } from './components/anniversify/anniversify.component';
 import { MatSelectModule } from '@angular/material/select';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { AnniversifyReportComponent } from './components/anniversify/anniversify-report/anniversify-report.component';
 
 
 
@@ -38,7 +39,8 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
     SpotifyAlbumSortComponent,
     AlbumSortPipe,
     PluralizePipe,
-    AnniversifyComponent
+    AnniversifyComponent,
+    AnniversifyReportComponent
   ],
   imports: [
     BrowserModule,
