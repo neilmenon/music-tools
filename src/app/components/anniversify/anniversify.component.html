@@ -15,7 +15,7 @@
             <span *ngIf="!anniversifyDetails.lastRun">Your first run should occur within 24 hours. </span> 
             <span *ngIf="anniversifyDetails.libraryLastFetched">Your Spotify library is updated weekly, last fetched <span [matTooltip]="moment(anniversifyDetails.libraryLastFetched).format()" style="text-decoration: underline;">{{ moment(anniversifyDetails.libraryLastFetched).locale('en-US').fromNow() }}</span>.</span>
             <span *ngIf="!anniversifyDetails.libraryLastFetched">Your Spotify library will be updated weekly.</span>
-            <span *ngIf="moment().diff(moment(anniversifyDetails.registerDate), 'days') <= 3"><br><hr>If you enabled email notifications, a welcome email was sent from <u>{{ emailSender }}</u>.<br><strong>Please check your spam/junk and make sure to WHITELIST this email so that you'll recieve notifications properly!</strong></span>
+            <span *ngIf="anniversifyDetails.registerDate && moment().diff(moment(anniversifyDetails.registerDate), 'days') <= 3"><br><hr>If you enabled email notifications, a welcome email was sent from <u>{{ emailSender }}</u>.<br><strong>Please check your spam/junk and make sure to WHITELIST this email so that you'll recieve notifications properly!</strong></span>
             <ng-container *ngIf="showDeleteConfirmation">
                 <hr>
                 <span style="font-weight: bold;">Are you sure you want to stop Anniversify? If so, click the button below. You are always welcome to start notifications again at any time!</span>

@@ -130,6 +130,7 @@ export class AnniversifyComponent implements OnInit {
       name: [null],
       libraryLastFetched: [null],
       notifyTime: [null, Validators.compose([Validators.required])],
+      registerDate: [null],
       pushNotificationObject: [null],
     })
   }

@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
+import { ApplicationRef, Component } from '@angular/core';
 import { SwUpdate } from '@angular/service-worker';
 import { MessageService } from './services/message.service';
+import { concat, first, interval, takeWhile } from 'rxjs';
+import { config } from './config/config';
 
 @Component({
   selector: 'app-root',
@@ -11,23 +13,34 @@ export class AppComponent {
   title = 'music-tools';
   isStandalone: boolean = (navigator as any)?.standalone
   isIOSSafari = this.getIOSSafari()
+  updateFound: boolean
 
-  constructor(private swUpdate: SwUpdate, private messageService: MessageService) {
-    if (this.swUpdate.isEnabled) {
-      swUpdate.versionUpdates.subscribe((update) => {
-        switch (update.type) {
-          case 'VERSION_READY':
+  constructor(
+    private swUpdate: SwUpdate,
+    private messageService: MessageService,
+    appRef: ApplicationRef
+  ) {
+    // Allow the app to stabilize first, before starting
+    // polling for updates with `interval()`.
+    const appIsStable$ = appRef.isStable.pipe(first(isStable => isStable === true))
+    const secondsInterval: number = this.isLocal ? 5 : 120
+    const intervalOnceStable$ = concat(appIsStable$, interval(secondsInterval * 1000))
+    intervalOnceStable$.pipe(takeWhile(() => !this.updateFound)).subscribe(async () => {
+      // console.log("Checking for app updates...")
+      try {
+        this.updateFound = await swUpdate.checkForUpdate()
+        if (this.updateFound) {
+          if (this.isLocal) {
+            window.location.reload()
+          } else {
             this.messageService.open("New app version is available!", "center", true)
-            break
-          case 'VERSION_INSTALLATION_FAILED':
-            // this.messageService.open(`Failed to install app version`)
-            break
-        }
-      })
-    } else {
-      console.warn("swUpdate not enabled")
-    }
+          }
 
+        }
+      } catch (err) {
+        console.error('Failed to check for updates: ', err);
+      }
+    })
   }
 
   get showAddToHomescreen(): boolean {
@@ -35,6 +48,10 @@ export class AppComponent {
     return !this.isStandalone &&
       this.isIOSSafari &&
       localStorage.getItem("dismissAddToHomescreen") != "true"
+  }
+
+  get isLocal(): boolean {
+    return config.spotify.redirectUri.includes("localhost")
   }
 
   getIOSSafari(): boolean {

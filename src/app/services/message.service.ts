@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { MatSnackBar, MatSnackBarHorizontalPosition } from '@angular/material/snack-bar'
+import { MatSnackBar, MatSnackBarHorizontalPosition, MatSnackBarVerticalPosition } from '@angular/material/snack-bar'
 
 @Injectable({
   providedIn: 'root',
@@ -23,25 +23,23 @@ export class MessageService {
     if (message.toLowerCase().includes("app version")) {
       this.snackBar.open(message, "Update", {
         horizontalPosition: this.positions[position],
+        verticalPosition: "bottom",
         duration: 0
       }).onAction().subscribe(() => {
-        if ('serviceWorker' in navigator) {
-          navigator.serviceWorker.getRegistrations().then(function(registrations) {
-            // registrations.map(r => { r.update() })
-            window.location.reload()
-           })
-          localStorage.setItem("dismissAddToHomescreen", "false")
-        }
+        window.location.reload()
+        localStorage.setItem("dismissAddToHomescreen", "false")
       })
     } else {
       if (persistent) {
         this.snackBar.open(message, undefined, {
           horizontalPosition: this.positions[position],
+          verticalPosition: "bottom",
           duration: 0
         })
       } else {
         this.snackBar.open(message, "Dismiss", {
           horizontalPosition: this.positions[position],
+          verticalPosition: "bottom",
           duration: 5000
         })
       }
