@@ -1,27 +1,25 @@
-# MusicTools
+# Neil's Music Tools
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 15.0.1.
+Here are some mini tools for music apps that I personally find useful in day-to-day life.
 
-## Development server
+## Spotify Library Album Sort
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+Provides some more ways to sort albums in your Spotify library.
 
-## Code scaffolding
+![tools neilmenon com_spotify-album-sort](https://github.com/neilmenon/music-tools/assets/47338272/80ab657d-9222-45f3-94cf-0bd2715062a4)
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+- **Why:** I wanted to pick albums from my that would take the time it took to do a task (e.g. washing dishes, driving). Spotify doesn't have a way to sort your albums by duration.
+- **Under the hood**: Angular, Spotify API, and `localStorage`.
 
-## Build
+## Anniversify
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+Notifies you when an album in your Spotify Library has an anniversary.
 
-## Running unit tests
+Email notifications             |  Spotify playlist
+:-------------------------:|:-------------------------:
+![Email notifications](https://github.com/neilmenon/music-tools/assets/47338272/62228baa-4358-4321-b1cd-aca7b2aa40b3)  |  ![IMG_AF679A541DF5-1 (2)](https://github.com/neilmenon/music-tools/assets/47338272/9c1a5e2b-9f99-4cf2-b6db-23ec79842594)
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+... also push notifications for iOS users (when app installed via Safari).
 
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+- **Why:** Not wanting to forget albums in my library + a bit of love of nostalgia.
+- **Under the hood**: Angular, Spotify API, and AWS (Lambda, EventBridge Scheduler, DynamoDB, SES, API Gateway, S3).
