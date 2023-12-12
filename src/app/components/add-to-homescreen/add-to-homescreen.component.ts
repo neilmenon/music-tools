@@ -6,8 +6,13 @@ import { Component } from '@angular/core';
   styleUrl: './add-to-homescreen.component.css'
 })
 export class AddToHomescreenComponent {
+  dismissedOnce: boolean
 
   dismiss() {
+    if (!this.dismissedOnce) {
+      this.dismissedOnce = true
+      return
+    }
     localStorage.setItem("dismissAddToHomescreen", "true")
   }
 
