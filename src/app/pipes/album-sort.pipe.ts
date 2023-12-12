@@ -20,8 +20,8 @@ export class AlbumSortPipe implements PipeTransform {
       case "# of Tracks": return sortDesc ? albums.sort((a, b) => b.api.album.total_tracks - a.api.album.total_tracks) :
         albums.sort((a, b) => a.api.album.total_tracks - b.api.album.total_tracks)
 
-      case "Anniversary": return sortDesc ? albums.sort((a, b) => this.getNextAnniversary(b.api.album.release_date).diff(moment()) - this.getNextAnniversary(a.api.album.release_date).diff(moment())) :
-        albums.sort((a, b) => this.getNextAnniversary(a.api.album.release_date).diff(moment()) - this.getNextAnniversary(b.api.album.release_date).diff(moment()))
+      // case "Anniversary": return sortDesc ? albums.sort((a, b) => this.getNextAnniversary(b.api.album.release_date).diff(moment()) - this.getNextAnniversary(a.api.album.release_date).diff(moment())) :
+      //   albums.sort((a, b) => this.getNextAnniversary(a.api.album.release_date).diff(moment()) - this.getNextAnniversary(b.api.album.release_date).diff(moment()))
       
       case "Popularity": return sortDesc ? albums.sort((a, b) => b.api.album.popularity - a.api.album.popularity) : 
         albums.sort((a, b) => a.api.album.popularity - b.api.album.popularity)
@@ -45,6 +45,6 @@ export class AlbumSortPipe implements PipeTransform {
   }
 }
 
-export const albumSortOptions = ["Added", "Release Date", "Duration", "# of Tracks", "Anniversary", "Popularity", "Label"] as const
+export const albumSortOptions = ["Added", "Release Date", "Duration", "# of Tracks", "Popularity", "Label"] as const
 export type AlbumSortKey = typeof albumSortOptions[number]
 export type SortOrder = "asc" | "desc"

@@ -157,7 +157,7 @@ export class AnniversifyComponent implements OnInit {
           let pushNotificationObject: PushNotificationObject = new PushNotificationObject()
           pushNotificationObject.subscription = JSON.parse(JSON.stringify(sub.toJSON()))
           this.anniversifyForm.controls['pushNotificationObject'].setValue(pushNotificationObject)
-          this.messageService.open("Notification permission granted. Save your settings to enable notifications!")
+          this.messageService.open("Notification permission granted. Make sure you save your settings to enable notifications!")
         })
         .catch(err => {
           this.messageService.open("Error while requesting push notification permissions. Did you disable permissions? If so, go to Settings > Notifications, find N.M.T, and toggle Allow Notifications, and restart this app.")
