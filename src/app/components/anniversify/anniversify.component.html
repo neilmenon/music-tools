@@ -81,9 +81,9 @@
                         </mat-select>
                     </mat-form-field>
                 </div>
-                <div class="multi-button-container">
+                <div class="multi-button-container" style="position: sticky; bottom: 0;">
                     <button mat-raised-button color="primary" (click)="setAnniversifyDetails()" *ngIf="!loadingUpdate"
-                        [innerHtml]="">
+                        [innerHtml]="" [style.animation]="flashUpdateButton ? 'blinker 1.5s linear infinite' : null">
                         <mat-icon *ngIf="anniversifyDetails">save</mat-icon>
                         <mat-icon *ngIf="!anniversifyDetails">start</mat-icon>
                         {{ anniversifyDetails ? ' Update Settings' : ' Start Anniversify' }}

@@ -28,6 +28,7 @@ export class AnniversifyComponent implements OnInit {
   moment = moment
   emailSender = config.anniversify.emailSender
   needsMoreScopes: boolean
+  flashUpdateButton: boolean
 
   constructor(
     private localStorageService: LocalStorageService,
@@ -66,6 +67,7 @@ export class AnniversifyComponent implements OnInit {
 
   setAnniversifyDetails() {
     this.saveClicked = true
+    this.flashUpdateButton = false
     if (!this.anniversifyForm.controls['playlistEnabled'].value && !this.anniversifyForm.controls['emailsEnabled'].value) {
       this.messageService.open("Either email or playlist  must be enabled to save!")
       return
@@ -157,7 +159,8 @@ export class AnniversifyComponent implements OnInit {
           let pushNotificationObject: PushNotificationObject = new PushNotificationObject()
           pushNotificationObject.subscription = JSON.parse(JSON.stringify(sub.toJSON()))
           this.anniversifyForm.controls['pushNotificationObject'].setValue(pushNotificationObject)
-          this.messageService.open("Notification permission granted. Make sure you save your settings to enable notifications!")
+          // this.messageService.open("Notification permission granted. Make sure you save your settings to enable notifications!")
+          this.flashUpdateButton = true
         })
         .catch(err => {
           this.messageService.open("Error while requesting push notification permissions. Did you disable permissions? If so, go to Settings > Notifications, find N.M.T, and toggle Allow Notifications, and restart this app.")

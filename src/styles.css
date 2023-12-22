@@ -363,3 +363,9 @@ table > tbody > tr:nth-child(odd) {
 mat-slide-toggle {
     padding: 0.25rem 0;
 }
+
+@keyframes blinker {
+    50% {
+        opacity: 0;
+    }
+}
