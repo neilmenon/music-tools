@@ -1,0 +1,17 @@
+<div class="center" style="margin-bottom: -34px;">
+    <h3 mat-dialog-title>Connect Last.fm</h3>
+</div>
+<div mat-dialog-content class="center">
+    <p class="center-all">
+        Connect your <a href="https://last.fm" target="_blank" tabindex="-1">Last.fm</a> account to enable extended library sorting!
+        <br>
+        <span style="font-size: 3rem;"><i class="fab fa-lastfm" style="color: #ba0000"></i></span>
+    </p>
+    <form [formGroup]="userForm">
+        <mat-form-field color="accent" appearance="outline">
+            <mat-label>Last.fm Username</mat-label>
+            <input matInput name="lastfmUsername" type="text" formControlName="lastfmUsername" tabindex="1">
+        </mat-form-field><br>
+        <button color="accent" mat-raised-button [disabled]="!(userForm.controls['lastfmUsername'].value?.trim()?.length > 0) || loading" (click)="validateAndRedirect()">Connect</button>
+    </form>
+</div>

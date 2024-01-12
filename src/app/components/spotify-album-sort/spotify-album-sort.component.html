@@ -2,16 +2,26 @@
 
 <div class="center-all page-container">
     <h1 class="page-title"><i class="fa fa-spotify"></i> Spotify Library Album Sort</h1>
-    <p>
+    <p class="actions-list">
         Provides some more ways to sort albums in your Spotify library.<br>
         <a routerLink="" class="action-link"><i class="fa fa-home"></i> Back to App List</a> 
         <ng-template [ngIf]="user">
             • <a (click)="toggleListView()" class="action-link clickable"><i class="fas fa-toggle-{{ sortPref.listView ? 'on': 'off' }}"></i> List View</a> 
             • <a (click)="canRefetchLibrary && !fetchLoading ? fetchLibrary() : null" [ngClass]="{ 'action-link clickable': canRefetchLibrary && !fetchLoading, 'grayed-out': !canRefetchLibrary || fetchLoading }"
-                [matTooltip]="canRefetchLibrary ? 'Re-fetch library now! This can be done once every 24 hours. Last fetched: ' + (lastFetchDate ? lastFetchDate.locale('en-US')?.fromNow() : 'never') : 'You may refetch your Spotify libray every 24 hours. You can refetch your library in ' + moment.duration(nextFetchDate.diff(moment())).locale('en-US').humanize() + '.'"
+                [matTooltip]="getFetchSpotifyTooltip()"
                 >
-                <i class="fas fa-sync-alt {{ fetchLoading ? 'fa-spin' : '' }}"></i> {{ !fetchLoading && !canRefetchLibrary ? 'Fetch Spotify Library (' + moment.duration(nextFetchDate.diff(moment())).humanize() + ')' : (canRefetchLibrary && !fetchLoading ? 'Fetch Spotify Library' : 'Fetching...') }}
+                <i class="fas fa-sync-alt {{ fetchLoading ? 'fa-spin' : '' }}"></i> {{ !fetchLoading && !canRefetchLibrary && nextFetchDate ? 'Fetch Spotify Library (' + moment.duration(nextFetchDate.diff(moment())).humanize() + ')' : (canRefetchLibrary && !fetchLoading ? 'Fetch Spotify Library' : 'Fetching Spotify Library (' + spotifyFetchProgress + '%)') }}
             </a>
+            <ng-container *ngIf="lastfmUsername">
+                • <a (click)="canRefetchLastfmData && !lastfmFetchLoading ? fetchLastmData() : null" [ngClass]="{ 'action-link clickable': canRefetchLastfmData && !lastfmFetchLoading, 'grayed-out': !canRefetchLastfmData || lastfmFetchLoading }"
+                    [matTooltip]="getFetchLastfmTooltip()"
+                    >
+                    <i class="fas fa-sync-alt {{ lastfmFetchLoading ? 'fa-spin' : '' }}"></i> {{ !lastfmFetchLoading && !canRefetchLastfmData && nextLastfmFetchDate ? 'Fetch Last.fm data (' + moment.duration(nextLastfmFetchDate.diff(moment())).humanize() + ')' : (canRefetchLastfmData && !lastfmFetchLoading ? 'Fetch Last.fm Data' : 'Fetching Last.fm Data (' + lastfmFetchProgress + '%)') }}
+                </a>
+            </ng-container>
+            <ng-container *ngIf="!lastfmUsername">
+                • <a *ngIf="!lastfmUsername" (click)="connectLastfm()" class="action-link clickable"> <i class="fab fa-lastfm" style="color: #ba0000"></i> Connect Last.fm</a> 
+            </ng-container>
         </ng-template>
         <br>
     </p>
@@ -19,12 +29,12 @@
 
     <div *ngIf="user && albumsInitial">
         <div class="album-sort-options no-scrollbar-container">
-            <mat-chip-option *ngFor="let option of sortOptions" [selected]="sortPref.sortKey == option" color="accent" (click)="changeSortKey(option)" [selectable]="false">
+            <mat-chip-option *ngFor="let option of sortOptions" [selected]="sortPref.sortKey == option" color="accent" (click)="changeSortKey(option)" [selectable]="false" [disabled]="isLastfmSortOption(option) && !lastfmUsername" [matTooltip]="'test'">
                 <mat-icon *ngIf="sortPref.sortKey == option" class="sort-icon">{{ sortPref.sortDesc ? 'arrow_downward' : 'arrow_upward' }}</mat-icon>
-                {{ option }}
+                <i class="fab fa-lastfm" style="color: #ba0000" *ngIf="isLastfmSortOption(option)"></i> {{ option }}
             </mat-chip-option>
         </div>
-        <p>{{ getSortDescription() }}</p>
+        <p [innerHTML]="getSortDescription()"></p>
         <p *ngIf="albumsInitial.length == 0">Not seeing your library? Click <strong>Fetch Spotify Library</strong>!</p>
         <mat-form-field appearance="outline" class="full-width" color="accent">
             <input matInput [formControl]='filterControl' placeholder="" type="text">
@@ -49,7 +59,7 @@
             </tbody>
         </table>
         <div [ngClass]="!mobileView() ? 'album-container' : 'album-container-mobile'"  *ngIf="!sortPref.listView">
-            <div *ngFor="let entry of albums | albumSort:sortPref.sortKey:sortPref.sortDesc" [ngClass]="!mobileView() ? 'album-card' : 'album-card-mobile'">
+            <div *ngFor="let entry of albums | albumSort:sortPref.sortKey:sortPref.sortDesc" [ngClass]="!mobileView() ? 'album-card' : 'album-card-mobile'" class="clickable" (click)="openSpotifyLink(entry.api.album.external_urls.spotify)">
                 <a href="{{ entry.api.album.external_urls.spotify }}" target="_blank">
                     <img src="{{ extractAlbumImage(entry.api.album.images) }}">
                 </a>

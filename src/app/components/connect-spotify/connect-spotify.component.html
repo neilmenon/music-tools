@@ -1,9 +1,23 @@
 <button mat-raised-button color="accent" *ngIf="(!user && showConnectButton) || needMoreScopes" (click)="spotifyService.redirectToAuthorizationPage(tool)" class="spotify-button">
     {{ needMoreScopes ? 'Re-Connect Spotify' : 'Connect Spotify' }}
 </button>
-<button mat-flat-button *ngIf="user && !tool" (click)="disconnect()">
-    Disconnect {{ localStorageService.getSpotifyUserDetails()?.display_name }}
-</button>
-<!-- <div *ngIf="user">
-    <mat-checkbox (change)="changeEmailPref()" [checked]="userPref.emails">Keep me posted on app updates via my Spotify email address (I won't spam you)!</mat-checkbox>
-</div> -->
+<div id="manageAccounts">
+    <div *ngIf="user && !tool">
+        <h4>Spotify</h4>
+        <div style="position: relative;">
+            <img width="100px" style="border-radius: 50%; border: 2px solid; display: block;" src="{{ spotifyUserImage }}">
+            <button mat-mini-fab color="primary" (click)="disconnect()" class="spotify-button profile-button" [matTooltip]="'Disconnect Spotify'">
+                <mat-icon>logout</mat-icon>
+            </button>
+        </div>
+    </div>
+    <div *ngIf="lastfmUser && !tool">
+        <h4>Last.fm</h4>
+        <div style="position: relative;">
+            <img width="100px" style="border-radius: 50%; border: 2px solid; display: block;" src="{{ lastfmUser.profileImage }}">
+            <button mat-mini-fab color="primary" (click)="disconnectLastfm()" class="lastfm-button profile-button" [matTooltip]="'Disconnect Last.fm'">
+                <mat-icon>logout</mat-icon>
+            </button>
+        </div>
+    </div>
+</div>

@@ -13,4 +13,7 @@ export const config = {
         emailSender: "${{ secrets.ANNIVERSIFY_EMAIL_SENDER }}",
         vapidPublicKey: "${{ secrets.VAPID_PUBLIC_KEY }}",
     },
+    lastfm: {
+        apiKey: "${{ secrets.LASTFM_API_KEY }}"
+    }
 }

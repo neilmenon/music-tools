@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { ANNIVERSIFY_DEVICE_TOKENS_SENT, SPOTIFY_ALBUM_LOCAL, SPOTIFY_AUTH_LOCAL, SPOTIFY_USER_LOCAL, USER_PREF_LOCAL } from '../constants/localStorageConstants';
-import { SpotifyAlbumEntryModel, SpotifyAuthModel, SpotifyLocalAlbumModel, UserPreferenceModel } from '../models/localStorageModel';
+import { ANNIVERSIFY_DEVICE_TOKENS_SENT, LASTFM_USER_DETAILS, SPOTIFY_ALBUM_LOCAL, SPOTIFY_AUTH_LOCAL, SPOTIFY_USER_LOCAL, USER_PREF_LOCAL } from '../constants/localStorageConstants';
+import { LastfmLocalUserModel, SpotifyAlbumEntryModel, SpotifyAuthModel, SpotifyLocalAlbumModel, UserPreferenceModel } from '../models/localStorageModel';
 import * as moment from 'moment';
 import { MessageService } from './message.service';
 
@@ -40,9 +40,10 @@ export class LocalStorageService {
     return JSON.parse(localStorage.getItem(SPOTIFY_ALBUM_LOCAL))
   }
 
-  setSpotifySavedAlbums(albums: SpotifyAlbumEntryModel[]): SpotifyLocalAlbumModel {
+  setSpotifySavedAlbums(albums: SpotifyAlbumEntryModel[], spotifyFetchedDate?: string, lastfmLastScanned?: number): SpotifyLocalAlbumModel {
     let spotifyLocalModel = new SpotifyLocalAlbumModel()
-    spotifyLocalModel.fetchedDate = moment().format()
+    spotifyLocalModel.fetchedDate = spotifyFetchedDate ? spotifyFetchedDate: this.getSpotifySavedAlbums()?.fetchedDate
+    spotifyLocalModel.lastfmLastScanned = lastfmLastScanned ? lastfmLastScanned : (this.getSpotifySavedAlbums()?.lastfmLastScanned ? this.getSpotifySavedAlbums().lastfmLastScanned : null)
     spotifyLocalModel.data = albums
 
     localStorage.setItem(SPOTIFY_ALBUM_LOCAL, JSON.stringify(spotifyLocalModel))
@@ -72,5 +73,33 @@ export class LocalStorageService {
 
   getAnniversifyDeviceTokensSent(): boolean {
     return localStorage.getItem(ANNIVERSIFY_DEVICE_TOKENS_SENT) == "true" ? true : false
+  }
+
+  getLastfmUsername(): string {
+    return (JSON.parse(localStorage.getItem(LASTFM_USER_DETAILS)) as LastfmLocalUserModel)?.username 
+  }
+
+  setLastfmUserDetails(lastfmLocalUserModel: LastfmLocalUserModel): void {
+    localStorage.setItem(LASTFM_USER_DETAILS, JSON.stringify(lastfmLocalUserModel))
+  }
+
+  getLastfmUserDetails(): LastfmLocalUserModel {
+    return (JSON.parse(localStorage.getItem(LASTFM_USER_DETAILS)) as LastfmLocalUserModel)
+  }
+
+  clearLastfmData(): void {
+    localStorage.removeItem(LASTFM_USER_DETAILS)
+
+    // clear out all the Last.fm fields in Spotify data
+    let spotifyModel = this.getSpotifySavedAlbums()
+    spotifyModel.lastfmLastScanned = null
+    if (spotifyModel?.data) {
+      spotifyModel.data.forEach(album => { 
+        album.custom.lastfmLastListened = null 
+        album.custom.lastfmScrobbles = null
+      })
+    }
+    localStorage.setItem(SPOTIFY_ALBUM_LOCAL, JSON.stringify(spotifyModel))
+    this.messageService.open("Disconnected your Last.fm account and cleared local data.")
   }
 }

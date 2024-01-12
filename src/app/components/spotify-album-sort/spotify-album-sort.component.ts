@@ -1,12 +1,16 @@
 import { Component, HostListener } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import * as moment from 'moment';
-import { debounceTime, distinctUntilChanged } from 'rxjs';
+import { BehaviorSubject, Observable, debounceTime, distinctUntilChanged } from 'rxjs';
+import { FETCH_FREQUENCIES } from 'src/app/constants/fetchFrequencies';
 import { SpotifyAlbumEntryModel, UserPreferenceSpotifySortModel } from 'src/app/models/localStorageModel';
-import { AlbumSortKey, albumSortOptions, SortOrder } from 'src/app/pipes/album-sort.pipe';
+import { AlbumSortKey, albumSortOptions, calculateSuggestedScore, SortOrder } from 'src/app/pipes/album-sort.pipe';
 import { PluralizePipe } from 'src/app/pipes/pluralize.pipe';
+import { LastfmService } from 'src/app/services/lastfm.service';
 import { LocalStorageService } from 'src/app/services/local-storage.service';
 import { SpotifyService } from 'src/app/services/spotify.service';
+import { ConnectLastfmComponent } from '../connect-lastfm/connect-lastfm.component';
 
 @Component({
   selector: 'app-spotify-album-sort',
@@ -35,12 +39,21 @@ export class SpotifyAlbumSortComponent {
   filterControl: FormControl = new FormControl()
 
   fetchLoading: boolean
+  lastfmFetchLoading: boolean
   lastFetchDate: moment.Moment
   nextFetchDate: moment.Moment
+  lastfmLastFetched: moment.Moment
+  nextLastfmFetchDate: moment.Moment
+  lastfmUsername: string
+  lastfmFetchProgress: number = 0
+  fetchFrequencies = FETCH_FREQUENCIES
+  spotifyFetchProgress: number = 0
 
   constructor(
     private localStorageService: LocalStorageService,
-    private spotifyService: SpotifyService
+    private spotifyService: SpotifyService,
+    private lastfmService: LastfmService,
+    private dialog: MatDialog,
   ) {
     this.innerWidth = window.innerWidth
 
@@ -65,7 +78,9 @@ export class SpotifyAlbumSortComponent {
 
     this.albumsInitial = this.localStorageService.getSpotifySavedAlbums() ? this.localStorageService.getSpotifySavedAlbums().data : []
     this.lastFetchDate = this.localStorageService.getSpotifySavedAlbums()?.fetchedDate ? moment(this.localStorageService.getSpotifySavedAlbums().fetchedDate) : null
-    this.nextFetchDate = this.lastFetchDate ? moment(this.localStorageService.getSpotifySavedAlbums().fetchedDate).add(1, 'days') : null
+    this.nextFetchDate = this.lastFetchDate ? moment(this.lastFetchDate).add(this.fetchFrequencies.spotify.value, this.fetchFrequencies.spotify.unit as any) : null
+    this.lastfmLastFetched = this.localStorageService.getSpotifySavedAlbums()?.lastfmLastScanned ? moment.unix(this.localStorageService.getSpotifySavedAlbums().lastfmLastScanned) : null
+    this.nextLastfmFetchDate = this.lastfmLastFetched ? moment(this.lastfmLastFetched).add(this.fetchFrequencies.lastfm.value, this.fetchFrequencies.lastfm.unit as any) : null
     this.albums = this.albumsInitial
 
     this.filterControl.valueChanges.pipe(debounceTime(200), distinctUntilChanged()).subscribe(() => {
@@ -75,6 +90,9 @@ export class SpotifyAlbumSortComponent {
     })
 
     this.sortPref = this.localStorageService.getUserPreferences().spotifySort
+    this.lastfmUsername = this.localStorageService.getLastfmUsername()
+    this.lastfmService.fetchProgress.subscribe(value => this.lastfmFetchProgress = value)
+    this.spotifyService.fetchProgress.subscribe(value => this.spotifyFetchProgress = value)
   }
 
   get user(): SpotifyApi.UserObjectPublic { 
@@ -82,13 +100,35 @@ export class SpotifyAlbumSortComponent {
   }
 
   get canRefetchLibrary(): boolean {
-    return !this.lastFetchDate || (this.lastFetchDate && moment().diff(this.lastFetchDate, 'days') >= 1)
+    return !this.lastFetchDate || (this.lastFetchDate && moment().diff(this.lastFetchDate, this.fetchFrequencies.spotify.unit as any) >= this.fetchFrequencies.spotify.value)
+  }
+
+  get canRefetchLastfmData(): boolean {
+    return !this.lastfmLastFetched || (this.lastfmLastFetched && moment().diff(this.lastfmLastFetched, this.fetchFrequencies.lastfm.unit as any) >= this.fetchFrequencies.lastfm.value)
+  }
+
+  getFetchSpotifyTooltip(): string {
+    return this.canRefetchLibrary ? `Re-fetch library now! This can be done every ${this.fetchFrequencies.spotify.value} ${this.fetchFrequencies.spotify.unit}. Last fetched: ${this.lastFetchDate ? this.lastFetchDate.locale('en-US')?.fromNow() : 'never'}` : `You may refetch your Spotify libray every ${this.fetchFrequencies.spotify.value} ${this.fetchFrequencies.spotify.unit}. Next fetch avaiable ${this.nextFetchDate ? 'in ' + moment.duration(this.nextFetchDate.diff(moment())).locale('en-US').humanize(): 'now'}.`
+  }
+
+  getFetchLastfmTooltip(): string {
+    return this.canRefetchLastfmData ? `Re-fetch Last.fm data now! This can be done every ${this.fetchFrequencies.lastfm.value} ${this.fetchFrequencies.lastfm.unit}. Last fetched: ${this.lastfmLastFetched ? this.lastfmLastFetched.locale('en-US')?.fromNow() : 'never'}` : `You may refetch your Last.fm data every ${this.fetchFrequencies.lastfm.value} ${this.fetchFrequencies.lastfm.unit}. Next fetch avaiable ${this.nextLastfmFetchDate ? 'in ' + moment.duration(this.nextLastfmFetchDate.diff(moment())).locale('en-US').humanize(): 'now'}.`
   }
 
   async fetchLibrary() {
     this.fetchLoading = true
     await this.spotifyService.getUserAlbums()
     window.location.reload()
+  }
+
+  async fetchLastmData() {
+    this.lastfmFetchLoading = true
+    await this.lastfmService.fetchLastfmDataForSpotifyAlbums()
+    window.location.reload()
+  }
+
+  connectLastfm() {
+    this.dialog.open(ConnectLastfmComponent)
   }
 
   extractAlbumImage(images: SpotifyApi.ImageObject[]): string {
@@ -111,6 +151,9 @@ export class SpotifyAlbumSortComponent {
       // case "Anniversary": return `${ this.getOrdinal(this.currentYear - moment(entry.api.album.release_date).year()) } • ${ moment(entry.api.album.release_date).format("MMM D") } • ${ moment(entry.api.album.release_date).set("year", this.currentYear).fromNow() }` 
       case "Popularity": return `Score: ${ entry.api.album.popularity }`
       case "Label": return entry.api.album.label
+      case "Last Played": return !entry.custom.lastfmLastListened ? "Never / Unknown" : `${moment.unix(entry.custom.lastfmLastListened).format("MM-DD-yyyy")} • ${moment.unix(entry.custom.lastfmLastListened).fromNow()}`
+      case "Plays": return !entry.custom.lastfmScrobbles ? "Unknown" : entry.custom.lastfmScrobbles.toLocaleString()
+      case "Suggested": return !entry.custom.lastfmLastListened ? "Unknown" : `Score: ${calculateSuggestedScore(entry).toLocaleString()}`
       default: return moment(entry.api.added_at).format("MM-DD-yyyy hh:mm A")
     }
   }
@@ -118,6 +161,9 @@ export class SpotifyAlbumSortComponent {
   getSortDescription(): string {
     switch(this.sortPref.sortKey) { 
       case "Popularity": return `Uses Spotify's score. Your Spotify library is ${ Math.round(this.albums.map(x => x.api.album.popularity).reduce((a, b) => a + b) / this.albums.length) }% mainstream.`
+      case "Last Played": return !this.lastfmLastFetched && this.lastfmUsername ? `Not seeing your Last.fm data? Use the fetch button to perform the initial fetch.` : `An album is considered played if you've listened to at least half of the tracks, sequentially.`
+      case "Plays": return !this.lastfmLastFetched && this.lastfmUsername ? `Not seeing your Last.fm data? Use the fetch button to perform the initial fetch.` : null 
+      case "Suggested": return "Gives a score that is a healthy balance between your <u>most played</u> albums and your <u>least frequently visited</u> albums. The <u>higher</u> the score, the more suggested the album is."
       // case "Anniversary": return "Shows when the next anniversary for the album is, so you can listen on that day!"
       default: return ""
     }
@@ -167,5 +213,13 @@ export class SpotifyAlbumSortComponent {
     let userPref = this.localStorageService.getUserPreferences()
     userPref.spotifySort = this.sortPref
     this.localStorageService.setUserPreferences(userPref)
+  }
+
+  openSpotifyLink(url: string) {
+    window.open(url, "_blank")
+  }
+
+  isLastfmSortOption(option: string): boolean {
+    return ['Last Played', 'Plays', 'Suggested'].includes(option)
   }
 }

@@ -9,6 +9,7 @@ export class SpotifyAuthModel {
 
 export class SpotifyLocalAlbumModel {
     fetchedDate: string
+    lastfmLastScanned: number
     data: SpotifyAlbumEntryModel[]
 }
 
@@ -19,9 +20,13 @@ export class SpotifyAlbumEntryModel {
 
 export class SpotifyCustomAlbumPropModel {
     duration: number
+    lastfmLastListened: number
+    lastfmScrobbles: number
 
     constructor() {
         this.duration = 0
+        this.lastfmLastListened = null
+        this.lastfmScrobbles = null
     }
 }
 
@@ -44,6 +49,18 @@ export class UserPreferenceSpotifySortModel {
         this.sortDesc = true
         this.sortKey = "Added"
         this.listView = false
+    }
+}
+
+export class LastfmLocalUserModel {
+    username: string
+    profileImage: string
+    registered: number
+
+    constructor() {
+        this.username = null
+        this.profileImage = null
+        this.registered = null
     }
 }
 

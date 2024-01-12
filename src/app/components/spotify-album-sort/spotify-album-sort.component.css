@@ -1,3 +1,6 @@
 .grayed-out {
     color: #bfbfbf
 }
+.actions-list a {
+    text-wrap: nowrap;
+}

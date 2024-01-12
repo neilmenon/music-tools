@@ -1,19 +1,21 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { catchError, delay, lastValueFrom, of, throwError } from 'rxjs';
+import { BehaviorSubject, catchError, delay, lastValueFrom, of, throwError } from 'rxjs';
 import { config } from '../config/config';
 import { MusicTool, SpotifyAlbumEntryModel, SpotifyAuthModel, SpotifyCustomAlbumPropModel, SpotifyLocalAlbumModel } from '../models/localStorageModel';
 import { SpotifyApiTokenModel } from '../models/spotifyApiModel';
 import { ErrorHandlerService } from './error-handler.service';
 import { LocalStorageService } from './local-storage.service';
 import { MessageService } from './message.service';
+import * as moment from 'moment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SpotifyService {
-
+  fetchProgress = new BehaviorSubject<number>(0)
+  
   constructor(
     private http: HttpClient,
     private messageService: MessageService,
@@ -88,11 +90,13 @@ export class SpotifyService {
 
   async getUserAlbums(): Promise<SpotifyLocalAlbumModel> {
     let albums: SpotifyApi.SavedAlbumObject[] = []
+    const cachedAlbums: SpotifyLocalAlbumModel = this.localStorageService.getSpotifySavedAlbums()
 
     let albumResponse: SpotifyApi.UsersSavedAlbumsResponse = await lastValueFrom(this.http.get<SpotifyApi.UsersSavedAlbumsResponse>("https://api.spotify.com/v1/me/albums?limit=50"))
     albums = albumResponse.items
     
     while (albumResponse.next) {
+      this.fetchProgress.next(Math.ceil((albums.length / albumResponse.total) * 100))
       albumResponse = await lastValueFrom(this.http.get<SpotifyApi.UsersSavedAlbumsResponse>(albumResponse.next).pipe(delay(500)))
       albums = [...albums, ...albumResponse.items]
     }
@@ -112,6 +116,10 @@ export class SpotifyService {
       // map custom/calculated properties
       customProperties.duration = x.album.tracks.items.map(x => x.duration_ms).reduce((a, b) => a + b, 0)
 
+      // preserve last played Last.fm stats (if exist)
+      customProperties.lastfmLastListened = cachedAlbums?.data?.find(y => y?.api?.album?.id == x?.album?.id)?.custom?.lastfmLastListened
+      customProperties.lastfmScrobbles = cachedAlbums?.data?.find(y => y?.api?.album?.id == x?.album?.id)?.custom?.lastfmScrobbles
+
       // strip extra data in object which is not needed (for now)
       x.album.available_markets = []
       x.album.tracks.items = []
@@ -119,6 +127,6 @@ export class SpotifyService {
       albumArray.push({ api: x, custom: customProperties })
     })
 
-    return this.localStorageService.setSpotifySavedAlbums(albumArray)
+    return this.localStorageService.setSpotifySavedAlbums(albumArray, moment().format())
   }
 }

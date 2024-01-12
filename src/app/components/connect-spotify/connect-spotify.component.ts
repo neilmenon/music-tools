@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { config } from 'src/app/config/config';
-import { MusicTool, SpotifyAuthModel, UserPreferenceModel } from 'src/app/models/localStorageModel';
+import { LastfmLocalUserModel, MusicTool, SpotifyAuthModel, UserPreferenceModel } from 'src/app/models/localStorageModel';
 import { SpotifyApiTokenModel } from 'src/app/models/spotifyApiModel';
 import { LocalStorageService } from 'src/app/services/local-storage.service';
 import { MessageService } from 'src/app/services/message.service';
@@ -53,7 +53,19 @@ export class ConnectSpotifyComponent implements OnInit {
     return this.localStorageService.getSpotifyUserDetails()
   }
 
+  get lastfmUser(): LastfmLocalUserModel {
+    return this.localStorageService.getLastfmUserDetails()
+  }
+
+  get spotifyUserImage(): string {
+    return this.user.images?.length ? this.user.images[this.user.images.length - 1].url : "https://lastfm.freetls.fastly.net/i/u/avatar170s/818148bf682d429dc215c1705eb27b98.webp"
+  }
+
   async disconnect() {
     this.localStorageService.clearSpotifyUserData()
+  }
+
+  disconnectLastfm() {
+    this.localStorageService.clearLastfmData()
   }
 }

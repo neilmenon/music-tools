@@ -12,6 +12,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { HttpRequestIncerceptorService } from './services/http-request-incerceptor.service';
 
 import { MatChipsModule } from '@angular/material/chips';
+import { MatDialogModule } from '@angular/material/dialog';
 import { ConnectSpotifyComponent } from './components/connect-spotify/connect-spotify.component';
 import { SpotifyAlbumSortComponent } from './components/spotify-album-sort/spotify-album-sort.component';
 import { AlbumSortPipe } from './pipes/album-sort.pipe';
@@ -29,6 +30,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { AnniversifyReportComponent } from './components/anniversify/anniversify-report/anniversify-report.component';
 import { AddToHomescreenComponent } from './components/add-to-homescreen/add-to-homescreen.component';
+import { ConnectLastfmComponent } from './components/connect-lastfm/connect-lastfm.component';
 
 
 
@@ -42,7 +44,8 @@ import { AddToHomescreenComponent } from './components/add-to-homescreen/add-to-
     PluralizePipe,
     AnniversifyComponent,
     AnniversifyReportComponent,
-    AddToHomescreenComponent
+    AddToHomescreenComponent,
+    ConnectLastfmComponent
   ],
   imports: [
     BrowserModule,
@@ -68,6 +71,7 @@ import { AddToHomescreenComponent } from './components/add-to-homescreen/add-to-
     BrowserAnimationsModule,
     MatCheckboxModule,
     MatSlideToggleModule,
+    MatDialogModule,
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: HttpRequestIncerceptorService, multi: true },

@@ -48,6 +48,10 @@ export class HttpRequestIncerceptorService implements HttpInterceptor {
           'SpotifyUserId': `${this.localStorageService.getSpotifyUserDetails()?.id}`
         },
       })
+    } else if (req.url.includes("audioscrobbler.com")) {
+      req = req.clone({
+        url: `${req.url}${this.localStorageService.getLastfmUsername() ? `&user=${this.localStorageService.getLastfmUsername()}` : ''}&api_key=${config.lastfm.apiKey}&format=json`
+      })
     }
 
     return await lastValueFrom(next.handle(req).pipe(
@@ -62,6 +66,23 @@ export class HttpRequestIncerceptorService implements HttpInterceptor {
 
           // handle error from the Spotify API
           this.messageService.open("The Spotify API returned an error instead of data." + this.errorHandlerService.getHttpErrorMessage(error))
+        } else if (
+          req.url.includes("audioscrobbler.com") &&
+          error instanceof HttpErrorResponse &&
+          error.status == 500
+        ) {
+          if (!req.params.has("retry")) {
+            console.warn("Last.fm API request failed with 500. Retrying...")
+            req = req.clone({
+              setParams: {
+                'retry': `1`,
+              },
+            })
+          } else {
+            this.messageService.open("The Last.fm API returned an error instead of data. Please reload and try again.", "center", true)
+            return lastValueFrom(throwError(() => error)) 
+          }
+          return lastValueFrom(next.handle(req))
         }
 
         return lastValueFrom(throwError(() => error)) 

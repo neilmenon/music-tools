@@ -13,4 +13,7 @@ export const config = {
         emailSender: "",
         vapidPublicKey: "",
     },
+    lastfm: {
+        apiKey: ""
+    }
 }

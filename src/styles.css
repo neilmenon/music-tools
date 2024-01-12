@@ -165,12 +165,17 @@ h1.page-title {
     }
 }
 
+.mat-mdc-dialog-surface.mdc-dialog__surface {
+    background-image: url(/assets/img/background.svg);
+    max-height: 100vh!important;
+}
+
 .page-container {
     padding-top: 4vw;
 }
 
 .app-list-container {
-    padding-top: 2rem;
+    padding-top: 1rem;
 }
 
 @media screen and (max-width: 960px) {
@@ -191,6 +196,11 @@ h1.page-title {
 
 .spotify-button {
     background: #1db954!important;
+    color: #fff!important;
+}
+
+.lastfm-button {
+    background: #ba0000!important;
     color: #fff!important;
 }
 

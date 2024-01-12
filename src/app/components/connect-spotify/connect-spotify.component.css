@@ -1,0 +1,15 @@
+.profile-button {
+    top: 63px;
+    position: absolute;
+    right: 1px;
+}
+#manageAccounts {
+    display: flex;
+    justify-content: center;
+}
+#manageAccounts div:not(:last-child) {
+    margin-right: 1rem
+}
+#manageAccounts h4 {
+    margin-bottom: 0.5rem;
+}
