@@ -24,7 +24,7 @@ export class LastfmService {
 
   async fetchLastfmDataForSpotifyAlbums(): Promise<void> {
     let spotifyAlbumModel: SpotifyLocalAlbumModel = this.localStorageService.getSpotifySavedAlbums()
-    const startingTimestamp: number = spotifyAlbumModel?.lastfmLastScanned ? spotifyAlbumModel.lastfmLastScanned - 3*60*60*24 : null
+    const startingTimestamp: number = spotifyAlbumModel?.lastfmLastScanned ? spotifyAlbumModel.lastfmLastScanned : null
     const now: number = Math.floor(Date.now() / 1000)
     const endingTimestamp: number = startingTimestamp ? now : null
     const fetchUrl: string = "https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&limit=1000" 
@@ -109,7 +109,7 @@ export class LastfmService {
       if (qualifierMet) {
         spotifyAlbum.custom.lastfmLastListened = (distinctTracksList.length >= 2 ? distinctTracksList[1] : distinctTracksList[0]).timestamp
       }
-      spotifyAlbum.custom.lastfmScrobbles = matchingLastfmRecord.scrobbles.length
+      spotifyAlbum.custom.lastfmScrobbles = spotifyAlbum.custom.lastfmScrobbles != null ? spotifyAlbum.custom.lastfmScrobbles + matchingLastfmRecord.scrobbles.length : null
       if (spotifyAlbum.custom.lastfmLastListened != 0) {
         console.log(`Set last listened for ${spotifyAlbum.api.album.artists.map(x => x.name).join(", ")} - ${spotifyAlbum.api.album.name} to ${moment.unix(spotifyAlbum.custom.lastfmLastListened)} w/ ${spotifyAlbum.custom.lastfmScrobbles} scrobble(s)`)
       } else {
