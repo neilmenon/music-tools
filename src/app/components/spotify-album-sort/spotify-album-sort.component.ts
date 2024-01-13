@@ -1,4 +1,4 @@
-import { Component, HostListener } from '@angular/core';
+import { AfterViewInit, Component, HostListener } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import * as moment from 'moment';
@@ -11,13 +11,14 @@ import { LastfmService } from 'src/app/services/lastfm.service';
 import { LocalStorageService } from 'src/app/services/local-storage.service';
 import { SpotifyService } from 'src/app/services/spotify.service';
 import { ConnectLastfmComponent } from '../connect-lastfm/connect-lastfm.component';
+import { MessageService } from 'src/app/services/message.service';
 
 @Component({
   selector: 'app-spotify-album-sort',
   templateUrl: './spotify-album-sort.component.html',
   styleUrls: ['./spotify-album-sort.component.css']
 })
-export class SpotifyAlbumSortComponent {
+export class SpotifyAlbumSortComponent implements AfterViewInit {
   innerWidth: number
 
   pluralizePipe: PluralizePipe = new PluralizePipe()
@@ -54,6 +55,7 @@ export class SpotifyAlbumSortComponent {
     private spotifyService: SpotifyService,
     private lastfmService: LastfmService,
     private dialog: MatDialog,
+    private messageService: MessageService,
   ) {
     this.innerWidth = window.innerWidth
 
@@ -93,6 +95,10 @@ export class SpotifyAlbumSortComponent {
     this.lastfmUsername = this.localStorageService.getLastfmUsername()
     this.lastfmService.fetchProgress.subscribe(value => this.lastfmFetchProgress = value)
     this.spotifyService.fetchProgress.subscribe(value => this.spotifyFetchProgress = value)
+  }
+
+  ngAfterViewInit(): void {
+    setTimeout(() => this.scrollToHorizontalSortOptions(this.sortPref.sortKey), 200)
   }
 
   get user(): SpotifyApi.UserObjectPublic { 
@@ -221,5 +227,36 @@ export class SpotifyAlbumSortComponent {
 
   isLastfmSortOption(option: string): boolean {
     return ['Last Played', 'Plays', 'Suggested'].includes(option)
+  }
+
+  scrollToHorizontalSortOptions(option: string) {
+    let el: HTMLElement = document.querySelector(`mat-chip-option[title="${option}"]`)
+    const elRight = el.offsetLeft + el.offsetWidth
+    const elNextRight = (el.nextSibling as HTMLElement)?.offsetLeft + (el.nextSibling as HTMLElement)?.offsetWidth
+    const elLeft = el.offsetLeft
+    const elPrevLeft = (el.previousSibling as HTMLElement)?.offsetLeft
+
+    const elParentRight = (el.parentNode as HTMLElement).offsetLeft + (el.parentNode as HTMLElement).offsetWidth
+    const elParentLeft = (el.parentNode as HTMLElement).offsetLeft;
+
+    setTimeout(() => {
+      // (el.parentNode as HTMLElement).scrollLeft = elLeft - elParentLeft - 20
+      // check if right side of the element is not in view
+      if (elNextRight > elParentRight + (el.parentNode as HTMLElement).scrollLeft) {
+        (el.parentNode as HTMLElement).scrollLeft = elRight - elParentRight + 50
+      }
+  
+      // check if left side of the element is not in view
+      else if (elPrevLeft < elParentLeft + (el.parentNode as HTMLElement).scrollLeft) {
+        (el.parentNode as HTMLElement).scrollLeft = elLeft - elParentLeft - 50
+      }
+    }, 500)
+
+  }
+
+  showConnectMessage(option: string) {
+    if (!this.lastfmUsername && this.isLastfmSortOption(option)) {
+      this.messageService.open("Connect (or create) a Last.fm account to use this sort option!")
+    }
   }
 }

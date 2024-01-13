@@ -69,7 +69,7 @@ export class AlbumSortPipe implements PipeTransform {
   }
 }
 
-export const albumSortOptions = ["Added", "Release Date", "Duration", "Last Played", "Plays", "Suggested", "# of Tracks", "Popularity", "Label"] as const
+export const albumSortOptions = ["Added", "Last Played", "Release Date", "Plays", "Duration", "# of Tracks", "Suggested", "Popularity", "Label"] as const
 export type AlbumSortKey = typeof albumSortOptions[number]
 export type SortOrder = "asc" | "desc"
 

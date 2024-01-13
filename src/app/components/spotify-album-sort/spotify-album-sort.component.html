@@ -29,7 +29,7 @@
 
     <div *ngIf="user && albumsInitial">
         <div class="album-sort-options no-scrollbar-container">
-            <mat-chip-option *ngFor="let option of sortOptions" [selected]="sortPref.sortKey == option" color="accent" (click)="changeSortKey(option)" [selectable]="false" [disabled]="isLastfmSortOption(option) && !lastfmUsername" [matTooltip]="'test'">
+            <mat-chip-option *ngFor="let option of sortOptions" [selected]="sortPref.sortKey == option" color="accent" (click)="changeSortKey(option); scrollToHorizontalSortOptions(option); showConnectMessage(option)" [selectable]="false" title="{{option}}">
                 <mat-icon *ngIf="sortPref.sortKey == option" class="sort-icon">{{ sortPref.sortDesc ? 'arrow_downward' : 'arrow_upward' }}</mat-icon>
                 <i class="fab fa-lastfm" style="color: #ba0000" *ngIf="isLastfmSortOption(option)"></i> {{ option }}
             </mat-chip-option>
