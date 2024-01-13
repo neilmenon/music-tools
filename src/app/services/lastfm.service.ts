@@ -109,7 +109,7 @@ export class LastfmService {
       if (qualifierMet) {
         spotifyAlbum.custom.lastfmLastListened = (distinctTracksList.length >= 2 ? distinctTracksList[1] : distinctTracksList[0]).timestamp
       }
-      spotifyAlbum.custom.lastfmScrobbles = spotifyAlbum.custom.lastfmScrobbles != null ? spotifyAlbum.custom.lastfmScrobbles + matchingLastfmRecord.scrobbles.length : null
+      spotifyAlbum.custom.lastfmScrobbles = spotifyAlbum.custom.lastfmScrobbles != null ? spotifyAlbum.custom.lastfmScrobbles + matchingLastfmRecord.scrobbles.length : matchingLastfmRecord.scrobbles.length
       if (spotifyAlbum.custom.lastfmLastListened != 0) {
         console.log(`Set last listened for ${spotifyAlbum.api.album.artists.map(x => x.name).join(", ")} - ${spotifyAlbum.api.album.name} to ${moment.unix(spotifyAlbum.custom.lastfmLastListened)} w/ ${spotifyAlbum.custom.lastfmScrobbles} scrobble(s)`)
       } else {
