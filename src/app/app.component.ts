@@ -13,6 +13,7 @@ export class AppComponent {
   title = 'music-tools';
   isStandalone: boolean = (navigator as any)?.standalone
   isIOSSafari = this.getIOSSafari()
+  isMobile = this.getIsMobile()
   updateFound: boolean
 
   constructor(
@@ -44,14 +45,18 @@ export class AppComponent {
   }
 
   get showAddToHomescreen(): boolean {
-    // return localStorage.getItem("dismissAddToHomescreen") != "true"
-    return !this.isStandalone &&
-      this.isIOSSafari &&
+    return config.spotify.redirectUri.includes('localhost') ? (localStorage.getItem("dismissAddToHomescreen") != "true") :
+      !this.isStandalone &&
+      this.isMobile &&
       localStorage.getItem("dismissAddToHomescreen") != "true"
   }
 
   get isLocal(): boolean {
     return config.spotify.redirectUri.includes("localhost")
+  }
+
+  getIsMobile(): boolean {
+    return /iPhone|iPad|iPod|Android|webOS|BlackBerry|Windows Phone/i.test(navigator.userAgent);
   }
 
   getIOSSafari(): boolean {

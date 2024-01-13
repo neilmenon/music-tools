@@ -212,6 +212,7 @@ h1.page-title {
     margin-bottom: 1rem;
     min-width: 155px;
     max-width: 155px;
+    color: #e2e2e2;
 }
 
 .album-card img {
@@ -221,6 +222,7 @@ h1.page-title {
 
 .album-card:hover, .album-card-mobile:hover {
     background: #282828;
+    color: #e2e2e2;
 }
 
 .album-container {
@@ -229,7 +231,7 @@ h1.page-title {
     justify-content: center;
 }
 
-.album-container > div:not(:last-child) {
+.album-container > a:not(:last-child) {
     margin-right: 15px;
 }
 
@@ -246,7 +248,7 @@ h1.page-title {
     justify-content: center;
 }
 
-.album-container-mobile > div:not(:last-child) {
+.album-container-mobile > a:not(:last-child) {
     margin-bottom: 1rem;
 }
 
@@ -259,6 +261,7 @@ h1.page-title {
     border-radius: 4px;
     width: 100%;
     overflow: hidden;
+    color: #e2e2e2;
 }
 
 .album-card-mobile > *:first-child {
@@ -378,4 +381,8 @@ mat-slide-toggle {
     50% {
         opacity: 0;
     }
+}
+[title="Suggested-container"] .mat-mdc-standard-chip .mdc-evolution-chip__action--primary {
+    padding-left: 6px!important;
+    padding-right: 6px!important;
 }

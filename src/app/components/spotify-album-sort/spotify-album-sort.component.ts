@@ -159,7 +159,7 @@ export class SpotifyAlbumSortComponent implements AfterViewInit {
       case "Label": return entry.api.album.label
       case "Last Played": return !entry.custom.lastfmLastListened ? "Never / Unknown" : `${moment.unix(entry.custom.lastfmLastListened).format("MM-DD-yyyy")} • ${moment.unix(entry.custom.lastfmLastListened).fromNow()}`
       case "Plays": return !entry.custom.lastfmScrobbles ? "Unknown" : entry.custom.lastfmScrobbles.toLocaleString()
-      case "Suggested": return !entry.custom.lastfmLastListened ? "Unknown" : `Score: ${calculateSuggestedScore(entry).toLocaleString()}`
+      case "Suggested": return !entry.custom.lastfmLastListened ? "Unknown" : `<i class="fas fa-star"></i> ${calculateSuggestedScore(entry).toFixed(1)} • <i class="fas fa-clock"></i> ${moment.unix(entry.custom.lastfmLastListened).fromNow()} • <i class="fas fa-play"></i> ${entry.custom.lastfmScrobbles.toLocaleString()}`
       default: return moment(entry.api.added_at).format("MM-DD-yyyy hh:mm A")
     }
   }
@@ -169,7 +169,7 @@ export class SpotifyAlbumSortComponent implements AfterViewInit {
       case "Popularity": return `Uses Spotify's score. Your Spotify library is ${ Math.round(this.albums.map(x => x.api.album.popularity).reduce((a, b) => a + b) / this.albums.length) }% mainstream.`
       case "Last Played": return !this.lastfmLastFetched && this.lastfmUsername ? `Not seeing your Last.fm data? Use the fetch button to perform the initial fetch.` : `An album is considered played if you've listened to at least half of the tracks, sequentially.`
       case "Plays": return !this.lastfmLastFetched && this.lastfmUsername ? `Not seeing your Last.fm data? Use the fetch button to perform the initial fetch.` : null 
-      case "Suggested": return "Gives a score that is a healthy balance between your <u>most played</u> albums and your <u>least frequently visited</u> albums. The <u>higher</u> the score, the more suggested the album is."
+      case "Suggested": return "Gives a score that is a healthy balance between your <u>most played</u> albums and <u>albums you haven't listened to in a while</u>. The <u>higher</u> the score, the more suggested the album is."
       // case "Anniversary": return "Shows when the next anniversary for the album is, so you can listen on that day!"
       default: return ""
     }

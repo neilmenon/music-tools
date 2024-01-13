@@ -52,23 +52,21 @@
             <tbody style="text-align: left">
                 <tr *ngFor="let entry of albums | albumSort:sortPref.sortKey:sortPref.sortDesc; let i = index">
                     <td class="table-border center">{{ i + 1 }}</td>
-                    <td class="table-border">{{ getSortDisplayValue(entry) }}</td>
+                    <td class="table-border" [innerHTML]="getSortDisplayValue(entry)"></td>
                     <td class="table-border"><a href="{{ entry.api.album.artists[0].external_urls.spotify }}" target="_blank">{{ formatArtists(entry.api.album.artists) }}</a></td>
                     <td class="table-border"><a href="{{ entry.api.album.external_urls.spotify }}" target="_blank">{{ entry.api.album.name }}</a></td>
                 </tr>
             </tbody>
         </table>
-        <div [ngClass]="!mobileView() ? 'album-container' : 'album-container-mobile'"  *ngIf="!sortPref.listView">
-            <div *ngFor="let entry of albums | albumSort:sortPref.sortKey:sortPref.sortDesc" [ngClass]="!mobileView() ? 'album-card' : 'album-card-mobile'" class="clickable" (click)="openSpotifyLink(entry.api.album.external_urls.spotify)">
-                <a href="{{ entry.api.album.external_urls.spotify }}" target="_blank">
-                    <img src="{{ extractAlbumImage(entry.api.album.images) }}">
-                </a>
+        <div [ngClass]="!mobileView() ? 'album-container' : 'album-container-mobile'"  *ngIf="!sortPref.listView" title="{{ sortPref.sortKey }}-container">
+            <a *ngFor="let entry of albums | albumSort:sortPref.sortKey:sortPref.sortDesc" [ngClass]="!mobileView() ? 'album-card' : 'album-card-mobile'" href="{{ entry.api.album.external_urls.spotify }}" target="_blank">
+                <img src="{{ extractAlbumImage(entry.api.album.images) }}">
                 <div class="text-ellipsis">
                     <div class="text-ellipsis" matTooltip="{{ entry.api.album.name }}" matTooltipPosition="above"><strong>{{ entry.api.album.name }}</strong></div>
                     <span>{{ formatArtists(entry.api.album.artists) }}</span><br>
-                    <mat-chip class="mat-chip-compact" style="margin-top: 0.4rem">{{ getSortDisplayValue(entry) }}</mat-chip>
+                    <mat-chip class="mat-chip-compact" style="margin-top: 0.4rem"><span [innerHTML]="getSortDisplayValue(entry)"></span></mat-chip>
                 </div>
-            </div>
+            </a>
         </div>
     </div>
 </div>
