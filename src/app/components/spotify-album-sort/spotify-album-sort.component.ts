@@ -122,12 +122,18 @@ export class SpotifyAlbumSortComponent implements AfterViewInit {
   }
 
   async fetchLibrary() {
+    if (this.mobileView()) {
+      this.messageService.open("Fetching Spotify library. Keep this screen open during the entirely of the fetch!", "center", true)
+    }
     this.fetchLoading = true
     await this.spotifyService.getUserAlbums()
     window.location.reload()
   }
 
   async fetchLastmData() {
+    if (this.mobileView()) {
+      this.messageService.open("Fetching Last.fm data. Keep this screen open during the entirely of the fetch!", "center", true)
+    }
     this.lastfmFetchLoading = true
     await this.lastfmService.fetchLastfmDataForSpotifyAlbums()
     window.location.reload()
