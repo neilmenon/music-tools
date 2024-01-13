@@ -5,8 +5,10 @@
     <div *ngIf="user && !tool">
         <h4>Spotify</h4>
         <div style="position: relative;">
-            <img width="100px" style="border-radius: 50%; border: 2px solid; display: block;" src="{{ spotifyUserImage }}">
-            <button mat-mini-fab color="primary" (click)="disconnect()" class="spotify-button profile-button" [matTooltip]="'Disconnect Spotify'">
+            <div style="width: 100px; height:100px">
+                <img width="100px" style="border-radius: 50%; border: 2px solid; display: block;" src="{{ spotifyUserImage }}">
+            </div>
+            <button mat-mini-fab color="accent" (click)="disconnect()" class="spotify-button profile-button" [matTooltip]="'Disconnect Spotify'">
                 <mat-icon>logout</mat-icon>
             </button>
         </div>
@@ -14,7 +16,9 @@
     <div *ngIf="lastfmUser && !tool">
         <h4>Last.fm</h4>
         <div style="position: relative;">
-            <img width="100px" style="border-radius: 50%; border: 2px solid; display: block;" src="{{ lastfmUser.profileImage }}">
+            <div style="width: 100px; height:100px">
+                <img width="100px" style="border-radius: 50%; border: 2px solid; display: block;" src="{{ lastfmUser.profileImage }}">
+            </div>
             <button mat-mini-fab color="primary" (click)="disconnectLastfm()" class="lastfm-button profile-button" [matTooltip]="'Disconnect Last.fm'">
                 <mat-icon>logout</mat-icon>
             </button>
