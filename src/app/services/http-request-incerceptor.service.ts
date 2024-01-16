@@ -68,23 +68,21 @@ export class HttpRequestIncerceptorService implements HttpInterceptor {
           this.messageService.open("The Spotify API returned an error instead of data." + this.errorHandlerService.getHttpErrorMessage(error))
         } else if (
           req.url.includes("audioscrobbler.com") &&
-          error instanceof HttpErrorResponse &&
-          error.status == 500
+          error instanceof HttpErrorResponse
         ) {
-          if (!req.params.has("retry")) {
-            console.warn("Last.fm API request failed with 500. Retrying...")
+          if (req.params.has("retry")) {
+            this.messageService.open("The Last.fm API returned an error instead of data. Please reload and try again.", "center", true)
+            return lastValueFrom(throwError(() => error)) 
+          } else {
+            console.warn("Last.fm API request failed. Retrying...")
             req = req.clone({
               setParams: {
                 'retry': `1`,
               },
             })
-          } else {
-            this.messageService.open("The Last.fm API returned an error instead of data. Please reload and try again.", "center", true)
-            return lastValueFrom(throwError(() => error)) 
+            return lastValueFrom(next.handle(req))
           }
-          return lastValueFrom(next.handle(req))
         }
-
         return lastValueFrom(throwError(() => error)) 
       })
     ));

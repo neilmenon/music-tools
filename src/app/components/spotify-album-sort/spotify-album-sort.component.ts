@@ -74,7 +74,7 @@ export class SpotifyAlbumSortComponent implements AfterViewInit {
         M:  '1mo',
         MM: '%dmo',
         y:  '1y',
-        yy: '%dY'
+        yy: '%dy'
       }
     });
 
@@ -173,9 +173,9 @@ export class SpotifyAlbumSortComponent implements AfterViewInit {
   getSortDescription(): string {
     switch(this.sortPref.sortKey) { 
       case "Popularity": return `Uses Spotify's score. Your Spotify library is ${ Math.round(this.albums.map(x => x.api.album.popularity).reduce((a, b) => a + b) / this.albums.length) }% mainstream.`
-      case "Last Played": return !this.lastfmLastFetched && this.lastfmUsername ? `Not seeing your Last.fm data? Use the fetch button to perform the initial fetch.` : `An album is considered played if you've listened to at least half of the tracks, sequentially.`
+      case "Last Played": return !this.lastfmLastFetched && this.lastfmUsername ? `Not seeing your Last.fm data? Use the fetch button to perform the initial fetch.` : `An album is considered played if you've listened to approximately 3/4ths of it, without too many repeats of the same track, and within a couple days. Pretty straightforward, right? 🙃`
       case "Plays": return !this.lastfmLastFetched && this.lastfmUsername ? `Not seeing your Last.fm data? Use the fetch button to perform the initial fetch.` : null 
-      case "Suggested": return "Gives a score that is a healthy balance between your <u>most played</u> albums and <u>albums you haven't listened to in a while</u>. The <u>higher</u> the score, the more suggested the album is."
+      case "Suggested": return !this.lastfmLastFetched && this.lastfmUsername ? `Not seeing your Last.fm data? Use the fetch button to perform the initial fetch.` : "Gives a score that is a healthy balance between your <u>most played</u> albums and <u>albums you haven't listened to in a while</u>. The <u>higher</u> the score, the more suggested the album is."
       // case "Anniversary": return "Shows when the next anniversary for the album is, so you can listen on that day!"
       default: return ""
     }
