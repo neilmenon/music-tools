@@ -6,10 +6,10 @@ Here are some mini tools for music apps that I personally find useful in day-to-
 
 Provides some more ways to sort albums in your Spotify library.
 
-![Spotify Library Album Sort](https://github.com/neilmenon/music-tools/assets/47338272/80ab657d-9222-45f3-94cf-0bd2715062a4)
+![Spotify Library Album Sort](https://github.com/neilmenon/music-tools/assets/47338272/4be4bd65-7f57-4129-9c80-4cb6a408e9d5)
 
 - **Why:** I wanted to pick albums from my library that would take the time it took to do a task (e.g. washing dishes, driving). Spotify doesn't have a way to sort your albums by duration, among other relevant fields.
-- **Under the hood**: Angular, Spotify API, and `localStorage`.
+- **Under the hood**: Angular, Spotify API, Last.fm API, and `localStorage`.
 
 ## Anniversify
 
