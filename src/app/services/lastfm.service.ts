@@ -81,7 +81,10 @@ export class LastfmService {
         }
       } else {
         matchingLastfmRecord = lastPlayedCustomRecordList.find(x => 
-          x.artist.toLowerCase() == spotifyAlbum.api.album.artists[0].name.toLowerCase() &&
+          (
+            x.artist.toLowerCase() == spotifyAlbum.api.album.artists[0].name.toLowerCase() ||
+            x.artist.replace(/^The\s/, "").toLowerCase() == spotifyAlbum.api.album.artists[0].name.replace(/^The\s/, "").toLowerCase()
+          ) &&
           x.album.toLowerCase() == spotifyAlbum.api.album.name.toLowerCase()
         )
       }
