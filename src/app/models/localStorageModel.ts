@@ -22,11 +22,13 @@ export class SpotifyCustomAlbumPropModel {
     duration: number
     lastfmLastListened: number
     lastfmScrobbles: number
+    fullPlayThroughs: number
 
     constructor() {
         this.duration = 0
         this.lastfmLastListened = null
         this.lastfmScrobbles = null
+        this.fullPlayThroughs = null
     }
 }
 

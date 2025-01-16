@@ -164,7 +164,8 @@ export class SpotifyAlbumSortComponent implements AfterViewInit {
       case "Popularity": return `Score: ${ entry.api.album.popularity }`
       case "Label": return entry.api.album.label
       case "Last Played": return !entry.custom.lastfmLastListened ? "Never / Unknown" : `${moment.unix(entry.custom.lastfmLastListened).format("MM-DD-yyyy")} • ${moment.unix(entry.custom.lastfmLastListened).fromNow()}`
-      case "Plays": return !entry.custom.lastfmScrobbles ? "Unknown" : entry.custom.lastfmScrobbles.toLocaleString()
+      case "Scrobbles": return !entry.custom.lastfmScrobbles ? "Unknown" : entry.custom.lastfmScrobbles.toLocaleString()
+      case "Playthroughs": return !entry.custom.fullPlayThroughs ? "Never / Unknown" : `${entry.custom.fullPlayThroughs}`
       case "Suggested": return !entry.custom.lastfmLastListened ? "Unknown" : `<i class="fas fa-star"></i> ${calculateSuggestedScore(entry).toFixed(1)} • <i class="fas fa-clock"></i> ${moment.unix(entry.custom.lastfmLastListened).fromNow()} • <i class="fas fa-play"></i> ${entry.custom.lastfmScrobbles.toLocaleString()}`
       default: return moment(entry.api.added_at).format("MM-DD-yyyy hh:mm A")
     }
@@ -174,7 +175,8 @@ export class SpotifyAlbumSortComponent implements AfterViewInit {
     switch(this.sortPref.sortKey) { 
       case "Popularity": return `Uses Spotify's score. Your Spotify library is ${ Math.round(this.albums.map(x => x.api.album.popularity).reduce((a, b) => a + b) / this.albums.length) }% mainstream.`
       case "Last Played": return !this.lastfmLastFetched && this.lastfmUsername ? `Not seeing your Last.fm data? Use the fetch button to perform the initial fetch.` : `An album is considered played if you've listened to approximately 3/4ths of it, without too many repeats of the same track, and within a couple days. Pretty straightforward, right? 🙃`
-      case "Plays": return !this.lastfmLastFetched && this.lastfmUsername ? `Not seeing your Last.fm data? Use the fetch button to perform the initial fetch.` : null 
+      case "Scrobbles": return !this.lastfmLastFetched && this.lastfmUsername ? `Not seeing your Last.fm data? Use the fetch button to perform the initial fetch.` : null 
+      case "Playthroughs": return !this.lastfmLastFetched && this.lastfmUsername ? `Not seeing your Last.fm data? Use the fetch button to perform the initial fetch.` : "Number of times you've listened to this album all the way through." 
       case "Suggested": return !this.lastfmLastFetched && this.lastfmUsername ? `Not seeing your Last.fm data? Use the fetch button to perform the initial fetch.` : "Gives a score that is a healthy balance between your <u>most played</u> albums and <u>albums you haven't listened to in a while</u>. The <u>higher</u> the score, the more suggested the album is."
       // case "Anniversary": return "Shows when the next anniversary for the album is, so you can listen on that day!"
       default: return ""
@@ -232,7 +234,7 @@ export class SpotifyAlbumSortComponent implements AfterViewInit {
   }
 
   isLastfmSortOption(option: string): boolean {
-    return ['Last Played', 'Plays', 'Suggested'].includes(option)
+    return ['Last Played', 'Plays', 'Suggested', 'Playthroughs'].includes(option)
   }
 
   scrollToHorizontalSortOptions(option: string) {

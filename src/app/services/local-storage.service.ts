@@ -97,6 +97,7 @@ export class LocalStorageService {
       spotifyModel.data.forEach(album => { 
         album.custom.lastfmLastListened = null 
         album.custom.lastfmScrobbles = null
+        album.custom.fullPlayThroughs = null
       })
     }
     localStorage.setItem(SPOTIFY_ALBUM_LOCAL, JSON.stringify(spotifyModel))

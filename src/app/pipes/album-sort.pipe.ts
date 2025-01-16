@@ -13,6 +13,8 @@ export class AlbumSortPipe implements PipeTransform {
     let albumsWithoutLastPlayed = albums.filter(x => !x.custom.lastfmLastListened)
     let albumsWithScrobbles = albums.filter(x => x.custom.lastfmScrobbles)
     let albumsWithoutScrobbles = albums.filter(x => !x.custom.lastfmScrobbles)
+    let albumsWithPlayThroughs = albums.filter(x => x.custom.fullPlayThroughs)
+    let albumsWithoutPlayThroughs = albums.filter(x => !x.custom.fullPlayThroughs)
     switch (sortKey) {      
       case "Release Date": return sortDesc ? albums.sort((a, b) => moment(b.api.album.release_date).unix() - moment(a.api.album.release_date).unix()) :
         albums.sort((a, b) => moment(a.api.album.release_date).unix() - moment(b.api.album.release_date).unix())
@@ -35,8 +37,11 @@ export class AlbumSortPipe implements PipeTransform {
       case "Last Played": return sortDesc ? albumsWithLastPlayed.sort((a, b) => b.custom.lastfmLastListened - a.custom.lastfmLastListened).concat(albumsWithoutLastPlayed) :
         albumsWithoutLastPlayed.concat(albumsWithLastPlayed.sort((a, b) => a.custom.lastfmLastListened - b.custom.lastfmLastListened))
 
-      case "Plays": return sortDesc ? albumsWithScrobbles.sort((a, b) => b.custom.lastfmScrobbles - a.custom.lastfmScrobbles).concat(albumsWithoutScrobbles) :
+      case "Scrobbles": return sortDesc ? albumsWithScrobbles.sort((a, b) => b.custom.lastfmScrobbles - a.custom.lastfmScrobbles).concat(albumsWithoutScrobbles) :
         albumsWithoutScrobbles.concat(albumsWithScrobbles.sort((a, b) => a.custom.lastfmScrobbles - b.custom.lastfmScrobbles))
+      
+      case "Playthroughs": return sortDesc ? albumsWithPlayThroughs.sort((a, b) => b.custom.fullPlayThroughs - a.custom.fullPlayThroughs).concat(albumsWithoutPlayThroughs) :
+        albumsWithoutPlayThroughs.concat(albumsWithPlayThroughs.sort((a, b) => a.custom.fullPlayThroughs - b.custom.fullPlayThroughs))
 
       case "Suggested": return sortDesc ? albumsWithLastPlayed.sort(this.suggestedSortFnDesc).concat(albumsWithoutLastPlayed) :
         albumsWithoutLastPlayed.concat(albumsWithLastPlayed.sort(this.suggestedSortFnAsc))
@@ -69,7 +74,7 @@ export class AlbumSortPipe implements PipeTransform {
   }
 }
 
-export const albumSortOptions = ["Added", "Last Played", "Release Date", "Plays", "Duration", "# of Tracks", "Suggested", "Popularity", "Label"] as const
+export const albumSortOptions = ["Added", "Last Played", "Release Date", "Playthroughs", "Duration", "Scrobbles", "# of Tracks", "Suggested", "Popularity", "Label"] as const
 export type AlbumSortKey = typeof albumSortOptions[number]
 export type SortOrder = "asc" | "desc"
 

@@ -93,11 +93,15 @@ export class LastfmService {
         return
       }
 
-      // determine last listened date
-      // defined as: listened to at least half of the album
+      // determine last listened date + # of distinct album plays
       const albumDistinctTracksListenQualifier: number = Math.ceil(spotifyAlbum.api.album.total_tracks * 0.75) // Math.ceil(spotifyAlbum.api.album.total_tracks / 2) + 1 // spotifyAlbum.api.album.total_tracks >= 15 ? 5 : 
       const freebeeMax: number = Math.ceil(spotifyAlbum.api.album.total_tracks / 10)
-      let scrobbleIndex: number = 0, distinctTracksList: { title: string, timestamp: number }[] = [], qualifierMet: boolean = false, freebeeCount: number = 0
+      let scrobbleIndex: number = 0, 
+          distinctTracksList: { title: string, timestamp: number }[] = [], 
+          distinctTracksListFinal: { title: string, timestamp: number }[] = [], 
+          qualifierMet: boolean = false, 
+          freebeeCount: number = 0,
+          albumPlays: number = 0
       while (scrobbleIndex < matchingLastfmRecord.scrobbles.length) {
         // check if time between current and last unique play is not greater than 2 days
         // if it is greater, did they really listen to the album through in one sitting?
@@ -121,14 +125,18 @@ export class LastfmService {
 
         // did they meet the qualifier?
         if (distinctTracksList.length >= albumDistinctTracksListenQualifier) {
-          qualifierMet = true
-          break
+          if (!qualifierMet) {
+            qualifierMet = true
+            distinctTracksListFinal = distinctTracksList
+          }
+          albumPlays++
+          distinctTracksList = []
         }
         scrobbleIndex++
       }
 
-      if (qualifierMet) {
-        spotifyAlbum.custom.lastfmLastListened = (distinctTracksList.length >= 2 ? distinctTracksList[1] : distinctTracksList[0]).timestamp
+      if (qualifierMet && distinctTracksListFinal.length > 0) {
+        spotifyAlbum.custom.lastfmLastListened = (distinctTracksListFinal.length >= 2 ? distinctTracksListFinal[1] : distinctTracksListFinal[0]).timestamp
       }
       spotifyAlbum.custom.lastfmScrobbles = spotifyAlbum.custom.lastfmScrobbles != null ? spotifyAlbum.custom.lastfmScrobbles + matchingLastfmRecord.scrobbles.length : matchingLastfmRecord.scrobbles.length
       if (spotifyAlbum.custom.lastfmLastListened != 0) {
@@ -136,6 +144,7 @@ export class LastfmService {
       } else {
         console.warn(`Unknown last played date for ${spotifyAlbum.api.album.artists.map(x => x.name).join(", ")} - ${spotifyAlbum.api.album.name} w/ ${spotifyAlbum.custom.lastfmScrobbles} scrobble(s)`)
       }
+      spotifyAlbum.custom.fullPlayThroughs = spotifyAlbum.custom.fullPlayThroughs != null ? spotifyAlbum.custom.fullPlayThroughs + albumPlays : albumPlays
     })
     spotifyAlbumModel.lastfmLastScanned = Math.floor(Date.now() / 1000)
     this.localStorageService.setSpotifySavedAlbums(spotifyAlbumModel.data, null, now)
