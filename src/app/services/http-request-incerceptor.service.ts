@@ -70,14 +70,15 @@ export class HttpRequestIncerceptorService implements HttpInterceptor {
           req.url.includes("audioscrobbler.com") &&
           error instanceof HttpErrorResponse
         ) {
-          if (req.params.has("retry")) {
+          if (req.params.has("retry") && req.params.get("retry") === "3") {
             this.messageService.open("The Last.fm API returned an error instead of data. Please reload and try again.", "center", true)
             return lastValueFrom(throwError(() => error)) 
           } else {
-            console.warn("Last.fm API request failed. Retrying...")
+            const retry: number = req.params.get("retry") ? parseInt(req.params.get("retry") as string) + 1 : 1
+            console.warn(`Last.fm API request failed. Retrying... ${retry}/3`)
             req = req.clone({
               setParams: {
-                'retry': `1`,
+                'retry': `${retry}`,
               },
             })
             return lastValueFrom(next.handle(req))

@@ -117,8 +117,13 @@ export class SpotifyService {
       customProperties.duration = x.album.tracks.items.map(x => x.duration_ms).reduce((a, b) => a + b, 0)
 
       // preserve last played Last.fm stats (if exist)
-      customProperties.lastfmLastListened = cachedAlbums?.data?.find(y => y?.api?.album?.id == x?.album?.id)?.custom?.lastfmLastListened
-      customProperties.lastfmScrobbles = cachedAlbums?.data?.find(y => y?.api?.album?.id == x?.album?.id)?.custom?.lastfmScrobbles
+      const existingProps = cachedAlbums?.data?.find(y => y?.api?.album?.id == x?.album?.id)?.custom
+
+      if (existingProps) {
+        customProperties.lastfmLastListened = existingProps.lastfmLastListened
+        customProperties.lastfmScrobbles = existingProps.lastfmScrobbles
+        customProperties.fullPlayThroughs = existingProps.lastfmScrobbles
+      }
 
       // strip extra data in object which is not needed (for now)
       x.album.available_markets = []
