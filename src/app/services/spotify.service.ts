@@ -122,7 +122,7 @@ export class SpotifyService {
       if (existingProps) {
         customProperties.lastfmLastListened = existingProps.lastfmLastListened
         customProperties.lastfmScrobbles = existingProps.lastfmScrobbles
-        customProperties.fullPlayThroughs = existingProps.lastfmScrobbles
+        customProperties.fullPlayThroughs = existingProps.fullPlayThroughs
       }
 
       // strip extra data in object which is not needed (for now)
