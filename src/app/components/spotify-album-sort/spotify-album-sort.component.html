@@ -38,7 +38,7 @@
         <p *ngIf="albumsInitial.length == 0">Not seeing your library? Click <strong>Fetch Spotify Library</strong>!</p>
         <mat-form-field appearance="outline" class="full-width" color="accent">
             <input matInput [formControl]='filterControl' placeholder="" type="text">
-            <mat-label><mat-icon>search</mat-icon><i> Filter library&nbsp;</i></mat-label>
+            <mat-label><mat-icon>search</mat-icon><i> Filter library&nbsp;•&nbsp;{{ albums.length | pluralize:'item' }}&nbsp;</i></mat-label>
         </mat-form-field>
         <table style="width: 100%" *ngIf="sortPref.listView">
             <thead class="sticky-table-header">
