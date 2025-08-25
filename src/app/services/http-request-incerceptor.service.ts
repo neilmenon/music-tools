@@ -12,98 +12,124 @@ import { config } from '../config/config';
   providedIn: 'root'
 })
 export class HttpRequestIncerceptorService implements HttpInterceptor {
-  private isRefreshing = false
+  private isRefreshing = false;
 
   constructor(
     private localStorageService: LocalStorageService,
     private spotifyService: SpotifyService,
     private messageService: MessageService,
     private errorHandlerService: ErrorHandlerService
-  ) { }
+  ) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    return from(this.handle(req, next))
+    return this.handle(req, next);
   }
 
-  async handle(req: HttpRequest<any>, next: HttpHandler) {
-    if (req.url.includes("api.spotify.com") || req.url.includes(config.anniversify.apiRoot) &&
+  handle(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    // Preventative Spotify token refresh
+    if (
+      (req.url.includes('api.spotify.com') || req.url.includes(config.anniversify.apiRoot)) &&
       moment().unix() >= this.localStorageService.getSpotifyAuthDetails()?.expiresUnix
     ) {
-      // refresh token handling (preventative)
-      await this.spotifyService.refreshToken()
+      return from(this.spotifyService.refreshToken()).pipe(
+        switchMap(() => this.forwardRequest(req, next))
+      );
     }
 
-    if (req.url.includes("api.spotify.com")) {
-      req = req.clone({
-        setHeaders: {
-          'Authorization': `Bearer ${this.localStorageService.getSpotifyAuthDetails()?.data.access_token}`,
-        },
-      })
-      
-    } else if (req.url.includes(config.anniversify.apiRoot)) {
-      let tokenToSend: string = this.localStorageService.getAnniversifyDeviceTokensSent() ? `${this.localStorageService.getSpotifyAuthDetails()?.data.refresh_token}` : `${this.localStorageService.getSpotifyAuthDetails()?.data.access_token}`
-      req = req.clone({
-        setHeaders: {
-          'Authorization': tokenToSend,
-          'SpotifyUserId': `${this.localStorageService.getSpotifyUserDetails()?.id}`
-        },
-      })
-    } else if (req.url.includes("audioscrobbler.com")) {
-      req = req.clone({
-        url: `${req.url}${this.localStorageService.getLastfmUsername() ? `&user=${this.localStorageService.getLastfmUsername()}` : ''}&api_key=${config.lastfm.apiKey}&format=json`
-      })
-    }
-
-    return await lastValueFrom(next.handle(req).pipe(
-      catchError(async (error) => {
-        if (
-          error instanceof HttpErrorResponse &&
-          req.url.includes("api.spotify.com")
-        ) {
-          if (error.status === 401) {
-            return lastValueFrom(await this.handle401Error(req, next))
-          }
-
-          // handle error from the Spotify API
-          this.messageService.open("The Spotify API returned an error instead of data." + this.errorHandlerService.getHttpErrorMessage(error))
-        } else if (
-          req.url.includes("audioscrobbler.com") &&
-          error instanceof HttpErrorResponse
-        ) {
-          if (req.params.has("retry") && req.params.get("retry") === "3") {
-            this.messageService.open("The Last.fm API returned an error instead of data. Please reload and try again.", "center", true)
-            return lastValueFrom(throwError(() => error)) 
-          } else {
-            const retry: number = req.params.get("retry") ? parseInt(req.params.get("retry") as string) + 1 : 1
-            console.warn(`Last.fm API request failed. Retrying... ${retry}/3`)
-            req = req.clone({
-              setParams: {
-                'retry': `${retry}`,
-              },
-            })
-            return lastValueFrom(next.handle(req))
-          }
-        }
-        return lastValueFrom(throwError(() => error)) 
-      })
-    ));
+    return this.forwardRequest(req, next);
   }
 
-  async handle401Error(req: HttpRequest<any>, next: HttpHandler) {
-    if (!this.isRefreshing) {
-      this.isRefreshing = true
-
-      // refresh token handling (after-the-error)
-      await this.spotifyService.refreshToken()
-      this.isRefreshing = false
+  private forwardRequest(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    // Spotify
+    if (req.url.includes('api.spotify.com')) {
       req = req.clone({
         setHeaders: {
-          'Authorization': `Bearer ${this.localStorageService.getSpotifyAuthDetails()?.data.access_token}`,
+          Authorization: `Bearer ${this.localStorageService.getSpotifyAuthDetails()?.data.access_token}`,
         },
-      })
-      return next.handle(req)
+      });
+    }
+    // Anniversify
+    else if (req.url.includes(config.anniversify.apiRoot)) {
+      const tokenToSend: string = this.localStorageService.getAnniversifyDeviceTokensSent()
+        ? `${this.localStorageService.getSpotifyAuthDetails()?.data.refresh_token}`
+        : `${this.localStorageService.getSpotifyAuthDetails()?.data.access_token}`;
+      req = req.clone({
+        setHeaders: {
+          Authorization: tokenToSend,
+          SpotifyUserId: `${this.localStorageService.getSpotifyUserDetails()?.id}`,
+        },
+      });
+    }
+    // Last.fm (audioscrobbler)
+    else if (req.url.includes('audioscrobbler.com')) {
+      req = req.clone({
+        url: `${req.url}${
+          this.localStorageService.getLastfmUsername() ? `&user=${this.localStorageService.getLastfmUsername()}` : ''
+        }&api_key=${config.lastfm.apiKey}&format=json`,
+      });
     }
 
+    return next.handle(req).pipe(
+      catchError((error: any) => {
+        // Spotify errors
+        if (error instanceof HttpErrorResponse && req.url.includes('api.spotify.com')) {
+          if (error.status === 401) {
+            return this.handle401Error(req, next);
+          }
+          this.messageService.open(
+            'The Spotify API returned an error instead of data. ' +
+              this.errorHandlerService.getHttpErrorMessage(error)
+          );
+          return throwError(() => error);
+        }
+
+        // Last.fm retry logic
+        if (req.url.includes('audioscrobbler.com') && error instanceof HttpErrorResponse) {
+          const retry = req.params.get('retry') ? parseInt(req.params.get('retry')!, 10) : 0;
+
+          if (retry >= 5) {
+            this.messageService.open(
+              'The Last.fm API returned an error instead of data. Please reload and try again.',
+              'center',
+              true
+            );
+            return throwError(() => error);
+          } else {
+            console.warn(`Last.fm API request failed. Retrying... ${retry + 1}/3`);
+            const retryReq = req.clone({
+              setParams: { retry: String(retry + 1) },
+            });
+            return this.forwardRequest(retryReq, next); 
+          }
+        }
+
+        return throwError(() => error);
+      })
+    );
+  }
+
+  private handle401Error(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    if (!this.isRefreshing) {
+      this.isRefreshing = true;
+
+      return from(this.spotifyService.refreshToken()).pipe(
+        switchMap(() => {
+          this.isRefreshing = false;
+          const newReq = req.clone({
+            setHeaders: {
+              Authorization: `Bearer ${this.localStorageService.getSpotifyAuthDetails()?.data.access_token}`,
+            },
+          });
+          return next.handle(newReq);
+        }),
+        catchError(err => {
+          this.isRefreshing = false;
+          return throwError(() => err);
+        })
+      );
+    }
+
+    // If refresh is already in progress, just forward the request
     return next.handle(req);
   }
 }
