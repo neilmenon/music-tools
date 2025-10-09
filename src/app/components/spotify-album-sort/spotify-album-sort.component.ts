@@ -87,7 +87,10 @@ export class SpotifyAlbumSortComponent implements AfterViewInit {
 
     this.filterControl.valueChanges.pipe(debounceTime(200), distinctUntilChanged()).subscribe(() => {
       this.albums = this.filterControl.value?.trim()?.length ? 
-        this.albumsInitial.filter(x => `${ x.api.album.name } ${ this.formatArtists(x.api.album.artists) }`.toLowerCase().includes(this.filterControl.value.toLowerCase())) : 
+        this.albumsInitial.filter(x => 
+          `${ x.api.album.name } ${ this.formatArtists(x.api.album.artists) }`.toLowerCase().includes(this.filterControl.value.toLowerCase()) ||
+          this.filterControl.value === x.api.album.id
+        ) : 
         this.albumsInitial
     })
 
@@ -266,5 +269,10 @@ export class SpotifyAlbumSortComponent implements AfterViewInit {
     if (!this.lastfmUsername && this.isLastfmSortOption(option)) {
       this.messageService.open("Connect (or create) a Last.fm account to use this sort option!")
     }
+  }
+
+  randomAlbumClicked() {
+    const randomAlbumId = this.albumsInitial[Math.floor(Math.random() * this.albumsInitial.length)].api.album.id
+    this.filterControl.setValue(`${randomAlbumId}`)
   }
 }
