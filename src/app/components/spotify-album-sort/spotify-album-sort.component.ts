@@ -275,4 +275,8 @@ export class SpotifyAlbumSortComponent implements AfterViewInit {
     const randomAlbumId = this.albumsInitial[Math.floor(Math.random() * this.albumsInitial.length)].api.album.id
     this.filterControl.setValue(`${randomAlbumId}`)
   }
+
+  clearFilter() {
+    this.filterControl.setValue('')
+  }
 }

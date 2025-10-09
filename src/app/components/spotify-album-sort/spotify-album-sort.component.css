@@ -4,3 +4,9 @@
 .actions-list a {
     text-wrap: nowrap;
 }
+.clear-filter {
+    position: absolute;
+    right: -0.2rem;
+    color: #858585;
+    cursor: pointer;
+}
