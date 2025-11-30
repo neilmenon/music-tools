@@ -7,21 +7,22 @@
         <a routerLink="" class="action-link"><i class="fa fa-home"></i> Back to App List</a> 
         <ng-template [ngIf]="user">
             • <a (click)="toggleListView()" class="action-link clickable"><i class="fas fa-toggle-{{ sortPref.listView ? 'on': 'off' }}"></i> List View</a> 
-            • <a (click)="canRefetchLibrary && !fetchLoading ? fetchLibrary() : null" [ngClass]="{ 'action-link clickable': canRefetchLibrary && !fetchLoading, 'grayed-out': !canRefetchLibrary || fetchLoading || lastfmFetchLoading }"
+            • <a (click)="canRefetchLibrary && !fetchLoading && !lastfmFetchLoading ? fetchData() : null" [ngClass]="{ 'action-link clickable': canRefetchLibrary && !fetchLoading && !lastfmFetchLoading, 'grayed-out': !canRefetchLibrary || fetchLoading || lastfmFetchLoading }"
                 [matTooltip]="getFetchSpotifyTooltip()"
                 >
-                <i class="fas fa-sync-alt {{ fetchLoading ? 'fa-spin' : '' }}"></i> {{ !fetchLoading && !canRefetchLibrary && nextFetchDate ? 'Fetch Spotify Library (' + moment.duration(nextFetchDate.diff(moment())).humanize() + ')' : (canRefetchLibrary && !fetchLoading ? 'Fetch Spotify Library' : 'Fetching Spotify Library (' + spotifyFetchProgress + '%)') }}
+                <i class="fas fa-sync-alt {{ fetchLoading || lastfmFetchLoading ? 'fa-spin' : '' }}"></i> {{ !fetchLoading && !lastfmFetchLoading && !canRefetchLibrary && nextFetchDate ? 'Sync Data (' + moment.duration(nextFetchDate.diff(moment())).humanize() + ')' : (canRefetchLibrary && !fetchLoading && !lastfmFetchLoading ? 'Sync Data' : 'Syncing (' + (fetchLoading ? 'Spotify: ' + spotifyFetchProgress : 'Last.fm: ' + lastfmFetchProgress) + '%)') }}
             </a>
-            <ng-container *ngIf="lastfmUsername">
-                • <a (click)="canRefetchLastfmData && !lastfmFetchLoading ? fetchLastmData() : null" [ngClass]="{ 'action-link clickable': canRefetchLastfmData && !lastfmFetchLoading, 'grayed-out': !canRefetchLastfmData || lastfmFetchLoading || fetchLoading }"
+            <!-- <ng-container *ngIf="lastfmUsername">
+                • <a (click)="canRefetchLastfmData && !lastfmFetchLoading ? fetchData() : null" [ngClass]="{ 'action-link clickable': canRefetchLastfmData && !lastfmFetchLoading, 'grayed-out': !canRefetchLastfmData || lastfmFetchLoading || fetchLoading }"
                     [matTooltip]="getFetchLastfmTooltip()"
                     >
                     <i class="fas fa-sync-alt {{ lastfmFetchLoading ? 'fa-spin' : '' }}"></i> {{ !lastfmFetchLoading && !canRefetchLastfmData && nextLastfmFetchDate ? 'Fetch Last.fm data (' + moment.duration(nextLastfmFetchDate.diff(moment())).humanize() + ')' : (canRefetchLastfmData && !lastfmFetchLoading ? 'Fetch Last.fm Data' : 'Fetching Last.fm Data (' + lastfmFetchProgress + '%)') }}
                 </a>
-            </ng-container>
+            </ng-container> -->
             <ng-container *ngIf="!lastfmUsername">
                 • <a *ngIf="!lastfmUsername" (click)="connectLastfm()" class="action-link clickable"> <i class="fab fa-lastfm" style="color: #ba0000"></i> Connect Last.fm</a> 
             </ng-container>
+            <span>• Last synced: {{ lastFetchDate ? lastFetchDate.format('MM/DD/YYYY hh:mm A') + ' (' + lastFetchDate.locale('en-short').fromNow() + ')' : 'never' }}</span>
         </ng-template>
         <br>
     </p>

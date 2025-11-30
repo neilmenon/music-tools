@@ -117,28 +117,35 @@ export class SpotifyAlbumSortComponent implements AfterViewInit {
   }
 
   getFetchSpotifyTooltip(): string {
-    return this.canRefetchLibrary ? `Re-fetch library now! This can be done every ${this.fetchFrequencies.spotify.value} ${this.fetchFrequencies.spotify.unit}. Last fetched: ${this.lastFetchDate ? this.lastFetchDate.locale('en-US')?.fromNow() : 'never'}` : `You may refetch your Spotify libray every ${this.fetchFrequencies.spotify.value} ${this.fetchFrequencies.spotify.unit}. Next fetch avaiable ${this.nextFetchDate ? 'in ' + moment.duration(this.nextFetchDate.diff(moment())).locale('en-US').humanize(): 'now'}.`
+    return this.canRefetchLibrary ? `Re-fetch data now! This can be done every ${this.fetchFrequencies.spotify.value} ${this.fetchFrequencies.spotify.unit}. Last fetched: ${this.lastFetchDate ? `${this.lastFetchDate.format()} - ${this.lastFetchDate.locale('en-US')?.fromNow()}` : 'never'}` : `You may refetch your data every ${this.fetchFrequencies.spotify.value} ${this.fetchFrequencies.spotify.unit}. Next fetch avaiable ${this.nextFetchDate ? 'in ' + moment.duration(this.nextFetchDate.diff(moment())).locale('en-US').humanize(): 'now'}.`
   }
 
   getFetchLastfmTooltip(): string {
-    return this.canRefetchLastfmData ? `Re-fetch Last.fm data now! This can be done every ${this.fetchFrequencies.lastfm.value} ${this.fetchFrequencies.lastfm.unit}. Last fetched: ${this.lastfmLastFetched ? this.lastfmLastFetched.locale('en-US')?.fromNow() : 'never'}` : `You may refetch your Last.fm data every ${this.fetchFrequencies.lastfm.value} ${this.fetchFrequencies.lastfm.unit}. Next fetch avaiable ${this.nextLastfmFetchDate ? 'in ' + moment.duration(this.nextLastfmFetchDate.diff(moment())).locale('en-US').humanize(): 'now'}.`
+    return this.canRefetchLastfmData ? `Re-fetch Last.fm data now! This can be done every ${this.fetchFrequencies.lastfm.value} ${this.fetchFrequencies.lastfm.unit}. Last fetched: ${this.lastfmLastFetched ? `${this.lastfmLastFetched.format()} - ${this.lastfmLastFetched.locale('en-US')?.fromNow()}` : 'never'}` : `You may refetch your Last.fm data every ${this.fetchFrequencies.lastfm.value} ${this.fetchFrequencies.lastfm.unit}. Next fetch avaiable ${this.nextLastfmFetchDate ? 'in ' + moment.duration(this.nextLastfmFetchDate.diff(moment())).locale('en-US').humanize(): 'now'}.`
   }
 
-  async fetchLibrary() {
+  async fetchData() {
+    let fullLastfmFetch 
+    if (this.lastfmUsername) {
+      fullLastfmFetch = confirm("Do a full refresh of Last.fm data (OK=Yes/Cancel=No)? This takes longer and is usually for one-time fixes.")
+    }
     if (this.mobileView()) {
       this.messageService.open("Fetching Spotify library. Keep this screen open during the entirely of the fetch!", "center", true)
     }
     this.fetchLoading = true
     await this.spotifyService.getUserAlbums()
-    window.location.reload()
-  }
-
-  async fetchLastmData() {
-    if (this.mobileView()) {
-      this.messageService.open("Fetching Last.fm data. Keep this screen open during the entirely of the fetch!", "center", true)
+    this.fetchLoading = false
+    if (this.lastfmUsername) {
+      if (this.mobileView()) {
+        this.messageService.open("Fetching Last.fm data. Keep this screen open during the entirely of the fetch!", "center", true)
+      }
+      if (fullLastfmFetch) {
+        this.localStorageService.clearLastfmData()
+      }
+      this.lastfmFetchLoading = true
+      await this.lastfmService.fetchLastfmDataForSpotifyAlbums()
+      this.lastfmFetchLoading = false
     }
-    this.lastfmFetchLoading = true
-    await this.lastfmService.fetchLastfmDataForSpotifyAlbums()
     window.location.reload()
   }
 
