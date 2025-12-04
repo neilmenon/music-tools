@@ -140,7 +140,7 @@ export class SpotifyAlbumSortComponent implements AfterViewInit {
         this.messageService.open("Fetching Last.fm data. Keep this screen open during the entirely of the fetch!", "center", true)
       }
       if (fullLastfmFetch) {
-        this.localStorageService.clearLastfmData()
+        this.localStorageService.clearLastfmData(false)
       }
       this.lastfmFetchLoading = true
       await this.lastfmService.fetchLastfmDataForSpotifyAlbums()

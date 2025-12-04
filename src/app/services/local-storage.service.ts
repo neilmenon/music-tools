@@ -87,8 +87,10 @@ export class LocalStorageService {
     return (JSON.parse(localStorage.getItem(LASTFM_USER_DETAILS)) as LastfmLocalUserModel)
   }
 
-  clearLastfmData(): void {
-    localStorage.removeItem(LASTFM_USER_DETAILS)
+  clearLastfmData(clearUser: boolean = true): void {
+    if (clearUser) {
+      localStorage.removeItem(LASTFM_USER_DETAILS)
+    }
 
     // clear out all the Last.fm fields in Spotify data
     let spotifyModel = this.getSpotifySavedAlbums()
@@ -101,6 +103,8 @@ export class LocalStorageService {
       })
     }
     localStorage.setItem(SPOTIFY_ALBUM_LOCAL, JSON.stringify(spotifyModel))
-    this.messageService.open("Disconnected your Last.fm account and cleared local data.")
+    if (clearUser) {
+      this.messageService.open("Disconnected your Last.fm account and cleared local data.")
+    }
   }
 }
