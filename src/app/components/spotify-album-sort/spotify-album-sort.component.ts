@@ -177,6 +177,7 @@ export class SpotifyAlbumSortComponent implements AfterViewInit {
       case "Scrobbles": return !entry.custom.lastfmScrobbles ? "Unknown" : entry.custom.lastfmScrobbles.toLocaleString()
       case "Playthroughs": return !entry.custom.fullPlayThroughs ? "Never / Unknown" : `${entry.custom.fullPlayThroughs}`
       case "Suggested": return !entry.custom.lastfmLastListened ? "Unknown" : `<i class="fas fa-star"></i> ${calculateSuggestedScore(entry).toFixed(1)} • <i class="fas fa-clock"></i> ${moment.unix(entry.custom.lastfmLastListened).fromNow()} • <i class="fas fa-play"></i> ${entry.custom.lastfmScrobbles.toLocaleString()}`
+      case "Avg. Time b/w Plays": return !entry.custom.averageTimeBetweenPlays ? "Unknown" : this.humanizeDurationToHours(Math.abs(entry.custom.averageTimeBetweenPlays))
       default: return moment(entry.api.added_at).format("MM-DD-yyyy hh:mm A")
     }
   }
@@ -189,6 +190,7 @@ export class SpotifyAlbumSortComponent implements AfterViewInit {
       case "Playthroughs": return !this.lastfmLastFetched && this.lastfmUsername ? `Not seeing your Last.fm data? Use the fetch button to perform the initial fetch.` : "Number of times you've listened to this album all the way through." 
       case "Suggested": return !this.lastfmLastFetched && this.lastfmUsername ? `Not seeing your Last.fm data? Use the fetch button to perform the initial fetch.` : "Gives a score that is a healthy balance between your <u>most played</u> albums and <u>albums you haven't listened to in a while</u>. The <u>higher</u> the score, the more suggested the album is."
       // case "Anniversary": return "Shows when the next anniversary for the album is, so you can listen on that day!"
+      case "Avg. Time b/w Plays": return !this.lastfmLastFetched && this.lastfmUsername ? `Not seeing your Last.fm data? Use the fetch button to perform the initial fetch.` : "The average time between your full plays of this album. One of the few stats that indicates your favorites without relying on play counts!"
       default: return ""
     }
   }
@@ -202,6 +204,49 @@ export class SpotifyAlbumSortComponent implements AfterViewInit {
 
     return `${ durationMoment.minutes() } min ${ durationMoment.seconds() } sec`
   }
+
+  /**
+   * Humanize a Unix duration (seconds or ms) into
+   * years, months, days, hours — showing at most
+   * the 2 most significant non-zero units.
+   *
+   * Assumptions:
+   * - 1 year = 365 days
+   * - 1 month = 30 days
+   */
+  humanizeDurationToHours(unixDuration: number): string {
+    let seconds =
+      unixDuration > 1e12
+        ? Math.floor(unixDuration / 1000)
+        : Math.floor(unixDuration);
+
+      const HOUR = 3600;
+      const DAY = 24 * HOUR;
+      const MONTH = 30 * DAY;
+      const YEAR = 365 * DAY;
+
+      const units = [
+        { label: 'year',  value: Math.floor(seconds / YEAR) },
+        { label: 'month', value: Math.floor((seconds %= YEAR) / MONTH) },
+        { label: 'day',   value: Math.floor((seconds %= MONTH) / DAY) },
+        { label: 'hour',  value: Math.floor((seconds %= DAY) / HOUR) },
+      ];
+
+      const nonZero = units.filter(u => u.value > 0);
+
+      // Keep only the 2 most significant units
+      const selected = nonZero.slice(0, 2);
+
+      // Always show at least hours
+      if (selected.length === 0) {
+        selected.push({ label: 'hour', value: 0 });
+      }
+
+      return selected
+        .map(u => `${u.value} ${u.label}${u.value !== 1 ? 's' : ''}`)
+        .join(' ');
+  }
+
 
   getOrdinal(n: number) {
     let ord = 'th'
@@ -244,7 +289,7 @@ export class SpotifyAlbumSortComponent implements AfterViewInit {
   }
 
   isLastfmSortOption(option: string): boolean {
-    return ['Last Played', 'Plays', 'Suggested', 'Playthroughs'].includes(option)
+    return ['Last Played', 'Plays', 'Suggested', 'Playthroughs', 'Avg. Time b/w Plays'].includes(option)
   }
 
   scrollToHorizontalSortOptions(option: string) {

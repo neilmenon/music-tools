@@ -24,6 +24,8 @@ export class SpotifyCustomAlbumPropModel {
     lastfmLastListened: number
     lastfmScrobbles: number
     fullPlayThroughs: number
+    averageTimeBetweenPlays: number
+    albumPlayTimestamps: number[]
 
     constructor() {
         this.duration = 0
@@ -31,6 +33,8 @@ export class SpotifyCustomAlbumPropModel {
         this.lastfmLastListened = null
         this.lastfmScrobbles = null
         this.fullPlayThroughs = null
+        this.averageTimeBetweenPlays = null
+        this.albumPlayTimestamps = []
     }
 }
 

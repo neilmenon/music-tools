@@ -102,7 +102,8 @@ export class LastfmService {
           distinctTracksListFinal: { title: string, timestamp: number }[] = [], 
           qualifierMet: boolean = false, 
           freebeeCount: number = 0,
-          albumPlays: number = 0
+          albumPlays: number = 0,
+          albumPlayTimestamps: number[] = []
       while (scrobbleIndex < matchingLastfmRecord.scrobbles.length) {
         // check if time between current and last unique play is not greater than 2 days
         // if it is greater, did they really listen to the album through in one sitting?
@@ -131,13 +132,32 @@ export class LastfmService {
             distinctTracksListFinal = distinctTracksList
           }
           albumPlays++
+          albumPlayTimestamps.push(distinctTracksList[distinctTracksList.length - 1].timestamp)
           distinctTracksList = []
         }
         scrobbleIndex++
       }
 
+      // if user is neilmenon, filter out any timestamps before November 6, 2020 from albumPlayTimestamps
+      if (this.localStorageService.getLastfmUsername()?.toLowerCase() == "neilmenon") {
+        const cutoffTimestamp: number = moment("November 6, 2020").unix()
+        albumPlayTimestamps = albumPlayTimestamps.filter(x => x >= cutoffTimestamp)
+      }
+
+      const averageTimeBetweenAlbumPlays: number = albumPlayTimestamps.length >= 2 ?
+        albumPlayTimestamps
+          .map((x, i, arr) => i == 0 ? 0 : x - arr[i - 1])
+          .filter(x => x != 0)
+          .reduce((a, b) => a + b, 0) / (albumPlayTimestamps.length - 1)
+        : 0
+
+      console.log(`Average time between album plays for ${spotifyAlbum.api.album.artists.map(x => x.name).join(", ")} - ${spotifyAlbum.api.album.name} is ${moment.duration(averageTimeBetweenAlbumPlays, "seconds").humanize()}`)
+      console.log('\t Album play timestamps: ', albumPlayTimestamps.map(x => moment.unix(x).format("YYYY-MM-DD HH:mm:ss")))
+
       if (qualifierMet && distinctTracksListFinal.length > 0) {
         spotifyAlbum.custom.lastfmLastListened = (distinctTracksListFinal.length >= 2 ? distinctTracksListFinal[1] : distinctTracksListFinal[0]).timestamp
+        spotifyAlbum.custom.averageTimeBetweenPlays = averageTimeBetweenAlbumPlays
+        spotifyAlbum.custom.albumPlayTimestamps = albumPlayTimestamps
       }
       spotifyAlbum.custom.lastfmScrobbles = spotifyAlbum.custom.lastfmScrobbles != null ? spotifyAlbum.custom.lastfmScrobbles + matchingLastfmRecord.scrobbles.length : matchingLastfmRecord.scrobbles.length
       if (spotifyAlbum.custom.lastfmLastListened != 0) {

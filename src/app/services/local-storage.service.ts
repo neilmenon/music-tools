@@ -100,6 +100,8 @@ export class LocalStorageService {
         album.custom.lastfmLastListened = null 
         album.custom.lastfmScrobbles = null
         album.custom.fullPlayThroughs = null
+        album.custom.averageTimeBetweenPlays = null
+        album.custom.albumPlayTimestamps = []
       })
     }
     localStorage.setItem(SPOTIFY_ALBUM_LOCAL, JSON.stringify(spotifyModel))
