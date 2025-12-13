@@ -39,16 +39,20 @@ export class LocalStorageService {
   getSpotifySavedAlbums(): SpotifyLocalAlbumModel {
     const albums: SpotifyLocalAlbumModel = JSON.parse(localStorage.getItem(SPOTIFY_ALBUM_LOCAL))
     albums.data.forEach(album => {
-      // populate average time between plays
+      // populate median time between plays (unbiased by play count)
       const albumPlayTimestamps: number[] = album.custom.albumPlayTimestamps ? album.custom.albumPlayTimestamps : []
 
-      const averageTimeBetweenAlbumPlays: number = albumPlayTimestamps.length >= 2 ?
-        albumPlayTimestamps
-          .map((x, i, arr) => i == 0 ? 0 : x - arr[i - 1])
-          .filter(x => x != 0)
-          .reduce((a, b) => a + b, 0) / (albumPlayTimestamps.length - 1)
+      const timeDifferences = albumPlayTimestamps
+        .map((x, i, arr) => i == 0 ? 0 : x - arr[i - 1])
+        .filter(x => x != 0)
+        .sort((a, b) => a - b)
+
+      const medianTimeBetweenAlbumPlays: number = timeDifferences.length >= 1 ?
+        timeDifferences.length % 2 === 0
+          ? (timeDifferences[timeDifferences.length / 2 - 1] + timeDifferences[timeDifferences.length / 2]) / 2
+          : timeDifferences[Math.floor(timeDifferences.length / 2)]
         : 0
-      album.custom.averageTimeBetweenPlays = averageTimeBetweenAlbumPlays
+      album.custom.averageTimeBetweenPlays = medianTimeBetweenAlbumPlays
     })
     return albums
   }

@@ -12,6 +12,7 @@ import { LocalStorageService } from 'src/app/services/local-storage.service';
 import { SpotifyService } from 'src/app/services/spotify.service';
 import { ConnectLastfmComponent } from '../connect-lastfm/connect-lastfm.component';
 import { MessageService } from 'src/app/services/message.service';
+import { AlbumViewComponent } from '../album-view/album-view.component';
 
 @Component({
   selector: 'app-spotify-album-sort',
@@ -153,6 +154,24 @@ export class SpotifyAlbumSortComponent implements AfterViewInit {
     this.dialog.open(ConnectLastfmComponent)
   }
 
+  openAlbumDialog(album: SpotifyAlbumEntryModel) {
+    // build display values for every sort option using existing formatter
+    const sortDisplayValues = albumSortOptions
+      .filter(opt => opt !== 'Suggested')
+      .map(opt => ({
+      option: opt,
+      value: this.getSortDisplayValue(album, opt as AlbumSortKey)
+    }))
+
+    this.dialog.open(AlbumViewComponent, {
+      data: {
+        album: album,
+        sortDisplayValues: sortDisplayValues
+      },
+      width: this.mobileView() ? '100%' : '350px'
+    })
+  }
+
   extractAlbumImage(images: SpotifyApi.ImageObject[]): string {
     return images.find(x => x.width == 300) ? images.find(x => x.width == 300).url : images[0].url
   }
@@ -165,8 +184,9 @@ export class SpotifyAlbumSortComponent implements AfterViewInit {
     return this.innerWidth <= 450
   }
 
-  getSortDisplayValue(entry: SpotifyAlbumEntryModel): string {
-    switch(this.sortPref.sortKey) {
+  getSortDisplayValue(entry: SpotifyAlbumEntryModel, overrideSortKey?: AlbumSortKey): string {
+    const key = overrideSortKey ? overrideSortKey : this.sortPref.sortKey
+    switch(key) {
       case "Release Date": return moment(entry.api.album.release_date).format("MM-DD-yyyy")
       case "Duration": return this.formatDuration(entry.custom.duration)
       case "# of Tracks": return this.pluralizePipe.transform(entry.api.album.total_tracks, "track")
@@ -207,7 +227,7 @@ export class SpotifyAlbumSortComponent implements AfterViewInit {
 
   /**
    * Humanize a Unix duration (seconds or ms) into
-   * years, months, days, hours — showing at most
+   * years, months, days, hours, minutes — showing at most
    * the 2 most significant non-zero units.
    *
    * Assumptions:
@@ -220,7 +240,8 @@ export class SpotifyAlbumSortComponent implements AfterViewInit {
         ? Math.floor(unixDuration / 1000)
         : Math.floor(unixDuration);
 
-      const HOUR = 3600;
+      const MINUTE = 60;
+      const HOUR = 60 * MINUTE;
       const DAY = 24 * HOUR;
       const MONTH = 30 * DAY;
       const YEAR = 365 * DAY;
@@ -230,6 +251,7 @@ export class SpotifyAlbumSortComponent implements AfterViewInit {
         { label: 'month', value: Math.floor((seconds %= YEAR) / MONTH) },
         { label: 'day',   value: Math.floor((seconds %= MONTH) / DAY) },
         { label: 'hour',  value: Math.floor((seconds %= DAY) / HOUR) },
+        { label: 'minute', value: Math.floor((seconds %= HOUR) / MINUTE) },
       ];
 
       const nonZero = units.filter(u => u.value > 0);
@@ -237,9 +259,9 @@ export class SpotifyAlbumSortComponent implements AfterViewInit {
       // Keep only the 2 most significant units
       const selected = nonZero.slice(0, 2);
 
-      // Always show at least hours
+      // Always show at least minutes
       if (selected.length === 0) {
-        selected.push({ label: 'hour', value: 0 });
+        selected.push({ label: 'minute', value: 0 });
       }
 
       return selected

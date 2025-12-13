@@ -59,12 +59,12 @@
                     <td class="table-border center">{{ i + 1 }}</td>
                     <td class="table-border" [innerHTML]="getSortDisplayValue(entry)"></td>
                     <td class="table-border"><a href="{{ entry.api.album.artists[0].external_urls.spotify }}" target="_blank">{{ formatArtists(entry.api.album.artists) }}</a></td>
-                    <td class="table-border"><a href="{{ entry.api.album.external_urls.spotify }}" target="_blank">{{ entry.api.album.name }}</a></td>
+                    <td class="table-border"><a (click)="openAlbumDialog(entry)" target="_blank" style="cursor: pointer;">{{ entry.api.album.name }}</a></td>
                 </tr>
             </tbody>
         </table>
         <div [ngClass]="!mobileView() ? 'album-container' : 'album-container-mobile'"  *ngIf="!sortPref.listView" title="{{ sortPref.sortKey }}-container">
-            <a *ngFor="let entry of albums | albumSort:sortPref.sortKey:sortPref.sortDesc" [ngClass]="!mobileView() ? 'album-card' : 'album-card-mobile'" href="{{ entry.api.album.external_urls.spotify }}" target="_blank">
+            <a *ngFor="let entry of albums | albumSort:sortPref.sortKey:sortPref.sortDesc" [ngClass]="!mobileView() ? 'album-card' : 'album-card-mobile'" (click)="openAlbumDialog(entry)" target="_blank" style="cursor: pointer;">
                 <img src="{{ extractAlbumImage(entry.api.album.images) }}">
                 <div class="text-ellipsis">
                     <div class="text-ellipsis" matTooltip="{{ entry.api.album.name }}" matTooltipPosition="above"><strong>{{ entry.api.album.name }}</strong></div>

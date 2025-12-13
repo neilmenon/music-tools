@@ -1,0 +1,30 @@
+<div class="album-view">
+    <div style="text-align: center;">
+        <div style="position: relative; display: inline-block;">
+            <a [href]="album.api.album.external_urls.spotify" target="_blank" [title]="'Open in Spotify'">
+            <img src="{{ extractAlbumImage(album.api.album.images) }}" 
+                 style="width: 250px; cursor: pointer;">
+            </a>
+        </div>
+        <div><strong>{{ album.api.album.name }}</strong></div>
+        <div>{{ formattedArtistName }}</div>
+    </div>
+
+	<div>Information</div>
+	<ul>
+		<li *ngFor="let item of sortDisplayValues">
+			<strong>{{ item.option }}: </strong>
+			<span [innerHTML]="item.value"></span>
+		</li>
+        <li>
+            <strong>Album Play Timestamps: </strong>
+            <span *ngIf="album.custom.albumPlayTimestamps">
+                <ol>
+                    <li *ngFor="let ts of album.custom.albumPlayTimestamps">
+                        {{ moment.unix(ts).format('MM/DD/YYYY hh:mm A') }} ({{ moment.unix(ts).locale('en-short').fromNow() }})
+                    </li>
+                </ol>
+            </span>
+        </li>
+	</ul>
+</div>
