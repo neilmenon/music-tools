@@ -48,7 +48,7 @@ export class AlbumSortPipe implements PipeTransform {
       case "Suggested": return sortDesc ? albumsWithLastPlayed.sort(this.suggestedSortFnDesc).concat(albumsWithoutLastPlayed) :
         albumsWithoutLastPlayed.concat(albumsWithLastPlayed.sort(this.suggestedSortFnAsc))
 
-      case "Avg. Time b/w Plays": return sortDesc ? albumsWithAvgTimeBetweenPlays.sort((a, b) => a.custom.averageTimeBetweenPlays - b.custom.averageTimeBetweenPlays).concat(albumsWithoutAvgTimeBetweenPlays) :
+      case "Time b/w Plays": return sortDesc ? albumsWithAvgTimeBetweenPlays.sort((a, b) => a.custom.averageTimeBetweenPlays - b.custom.averageTimeBetweenPlays).concat(albumsWithoutAvgTimeBetweenPlays) :
         albumsWithoutAvgTimeBetweenPlays.concat(albumsWithAvgTimeBetweenPlays.sort((a, b) => b.custom.averageTimeBetweenPlays - a.custom.averageTimeBetweenPlays))
 
       default: return sortDesc ? albums.sort((a, b) => moment(b.api.added_at).unix() - moment(a.api.added_at).unix()) :
@@ -79,7 +79,7 @@ export class AlbumSortPipe implements PipeTransform {
   }
 }
 
-export const albumSortOptions = ["Added", "Last Played", "Release Date", "Playthroughs", "Duration", "Avg. Time b/w Plays", "Scrobbles", "# of Tracks", "Suggested", "Popularity", "Label"] as const
+export const albumSortOptions = ["Added", "Last Played", "Release Date", "Playthroughs", "Duration", "Time b/w Plays", "Scrobbles", "# of Tracks", "Suggested", "Popularity", "Label"] as const
 export type AlbumSortKey = typeof albumSortOptions[number]
 export type SortOrder = "asc" | "desc"
 

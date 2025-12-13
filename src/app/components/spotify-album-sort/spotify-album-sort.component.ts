@@ -197,7 +197,7 @@ export class SpotifyAlbumSortComponent implements AfterViewInit {
       case "Scrobbles": return !entry.custom.lastfmScrobbles ? "Unknown" : entry.custom.lastfmScrobbles.toLocaleString()
       case "Playthroughs": return !entry.custom.fullPlayThroughs ? "Never / Unknown" : `${entry.custom.fullPlayThroughs}`
       case "Suggested": return !entry.custom.lastfmLastListened ? "Unknown" : `<i class="fas fa-star"></i> ${calculateSuggestedScore(entry).toFixed(1)} • <i class="fas fa-clock"></i> ${moment.unix(entry.custom.lastfmLastListened).fromNow()} • <i class="fas fa-play"></i> ${entry.custom.lastfmScrobbles.toLocaleString()}`
-      case "Avg. Time b/w Plays": return !entry.custom.averageTimeBetweenPlays ? "Unknown" : this.humanizeDurationToHours(Math.abs(entry.custom.averageTimeBetweenPlays))
+      case "Time b/w Plays": return !entry.custom.averageTimeBetweenPlays ? "Unknown" : this.humanizeDurationToHours(Math.abs(entry.custom.averageTimeBetweenPlays))
       default: return moment(entry.api.added_at).format("MM-DD-yyyy hh:mm A")
     }
   }
@@ -210,7 +210,7 @@ export class SpotifyAlbumSortComponent implements AfterViewInit {
       case "Playthroughs": return !this.lastfmLastFetched && this.lastfmUsername ? `Not seeing your Last.fm data? Use the fetch button to perform the initial fetch.` : "Number of times you've listened to this album all the way through." 
       case "Suggested": return !this.lastfmLastFetched && this.lastfmUsername ? `Not seeing your Last.fm data? Use the fetch button to perform the initial fetch.` : "Gives a score that is a healthy balance between your <u>most played</u> albums and <u>albums you haven't listened to in a while</u>. The <u>higher</u> the score, the more suggested the album is."
       // case "Anniversary": return "Shows when the next anniversary for the album is, so you can listen on that day!"
-      case "Avg. Time b/w Plays": return !this.lastfmLastFetched && this.lastfmUsername ? `Not seeing your Last.fm data? Use the fetch button to perform the initial fetch.` : "The average time between your full plays of this album. One of the few stats that indicates your favorites without relying on play counts!"
+      case "Time b/w Plays": return !this.lastfmLastFetched && this.lastfmUsername ? `Not seeing your Last.fm data? Use the fetch button to perform the initial fetch.` : "The median time between your full plays of this album. One of the few stats that indicates your favorites without relying on play counts!"
       default: return ""
     }
   }
@@ -311,7 +311,7 @@ export class SpotifyAlbumSortComponent implements AfterViewInit {
   }
 
   isLastfmSortOption(option: string): boolean {
-    return ['Last Played', 'Plays', 'Suggested', 'Playthroughs', 'Avg. Time b/w Plays'].includes(option)
+    return ['Last Played', 'Plays', 'Suggested', 'Playthroughs', 'Time b/w Plays'].includes(option)
   }
 
   scrollToHorizontalSortOptions(option: string) {
