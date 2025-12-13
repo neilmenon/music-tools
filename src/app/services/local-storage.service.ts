@@ -37,7 +37,20 @@ export class LocalStorageService {
   }
 
   getSpotifySavedAlbums(): SpotifyLocalAlbumModel {
-    return JSON.parse(localStorage.getItem(SPOTIFY_ALBUM_LOCAL))
+    const albums: SpotifyLocalAlbumModel = JSON.parse(localStorage.getItem(SPOTIFY_ALBUM_LOCAL))
+    albums.data.forEach(album => {
+      // populate average time between plays
+      const albumPlayTimestamps: number[] = album.custom.albumPlayTimestamps ? album.custom.albumPlayTimestamps : []
+
+      const averageTimeBetweenAlbumPlays: number = albumPlayTimestamps.length >= 2 ?
+        albumPlayTimestamps
+          .map((x, i, arr) => i == 0 ? 0 : x - arr[i - 1])
+          .filter(x => x != 0)
+          .reduce((a, b) => a + b, 0) / (albumPlayTimestamps.length - 1)
+        : 0
+      album.custom.averageTimeBetweenPlays = averageTimeBetweenAlbumPlays
+    })
+    return albums
   }
 
   setSpotifySavedAlbums(albums: SpotifyAlbumEntryModel[], spotifyFetchedDate?: string, lastfmLastScanned?: number): SpotifyLocalAlbumModel {

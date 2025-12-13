@@ -144,20 +144,9 @@ export class LastfmService {
         albumPlayTimestamps = albumPlayTimestamps.filter(x => x >= cutoffTimestamp)
       }
 
-      const averageTimeBetweenAlbumPlays: number = albumPlayTimestamps.length >= 2 ?
-        albumPlayTimestamps
-          .map((x, i, arr) => i == 0 ? 0 : x - arr[i - 1])
-          .filter(x => x != 0)
-          .reduce((a, b) => a + b, 0) / (albumPlayTimestamps.length - 1)
-        : 0
-
-      console.log(`Average time between album plays for ${spotifyAlbum.api.album.artists.map(x => x.name).join(", ")} - ${spotifyAlbum.api.album.name} is ${moment.duration(averageTimeBetweenAlbumPlays, "seconds").humanize()}`)
-      console.log('\t Album play timestamps: ', albumPlayTimestamps.map(x => moment.unix(x).format("YYYY-MM-DD HH:mm:ss")))
-
       if (qualifierMet && distinctTracksListFinal.length > 0) {
         spotifyAlbum.custom.lastfmLastListened = (distinctTracksListFinal.length >= 2 ? distinctTracksListFinal[1] : distinctTracksListFinal[0]).timestamp
-        spotifyAlbum.custom.averageTimeBetweenPlays = averageTimeBetweenAlbumPlays
-        spotifyAlbum.custom.albumPlayTimestamps = albumPlayTimestamps
+        spotifyAlbum.custom.albumPlayTimestamps = Array.from(new Set([...spotifyAlbum.custom.albumPlayTimestamps, ...albumPlayTimestamps])).sort((a, b) => a - b)
       }
       spotifyAlbum.custom.lastfmScrobbles = spotifyAlbum.custom.lastfmScrobbles != null ? spotifyAlbum.custom.lastfmScrobbles + matchingLastfmRecord.scrobbles.length : matchingLastfmRecord.scrobbles.length
       if (spotifyAlbum.custom.lastfmLastListened != 0) {
