@@ -48,8 +48,8 @@ export class AlbumSortPipe implements PipeTransform {
       case "Suggested": return sortDesc ? albumsWithLastPlayed.sort(this.suggestedSortFnDesc).concat(albumsWithoutLastPlayed) :
         albumsWithoutLastPlayed.concat(albumsWithLastPlayed.sort(this.suggestedSortFnAsc))
 
-      case "Avg. Time b/w Plays": return sortDesc ? albumsWithAvgTimeBetweenPlays.sort((a, b) => b.custom.averageTimeBetweenPlays - a.custom.averageTimeBetweenPlays).concat(albumsWithoutAvgTimeBetweenPlays) :
-        albumsWithoutAvgTimeBetweenPlays.concat(albumsWithAvgTimeBetweenPlays.sort((a, b) => a.custom.averageTimeBetweenPlays - b.custom.averageTimeBetweenPlays))
+      case "Avg. Time b/w Plays": return sortDesc ? albumsWithAvgTimeBetweenPlays.sort((a, b) => a.custom.averageTimeBetweenPlays - b.custom.averageTimeBetweenPlays).concat(albumsWithoutAvgTimeBetweenPlays) :
+        albumsWithoutAvgTimeBetweenPlays.concat(albumsWithAvgTimeBetweenPlays.sort((a, b) => b.custom.averageTimeBetweenPlays - a.custom.averageTimeBetweenPlays))
 
       default: return sortDesc ? albums.sort((a, b) => moment(b.api.added_at).unix() - moment(a.api.added_at).unix()) :
         albums.sort((a, b) => moment(a.api.added_at).unix() - moment(b.api.added_at).unix())
