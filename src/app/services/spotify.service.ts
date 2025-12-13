@@ -113,6 +113,8 @@ export class SpotifyService {
         tracks = [...tracks, ...trackResponse.items]
       }
 
+      customProperties.discs = new Set(tracks.map(t => t.disc_number)).size
+
       // map custom/calculated properties
       customProperties.duration = x.album.tracks.items.map(x => x.duration_ms).reduce((a, b) => a + b, 0)
 

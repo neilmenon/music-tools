@@ -94,8 +94,9 @@ export class LastfmService {
       }
 
       // determine last listened date + # of distinct album plays
-      const albumDistinctTracksListenQualifier: number = Math.ceil(spotifyAlbum.api.album.total_tracks * 0.75) // Math.ceil(spotifyAlbum.api.album.total_tracks / 2) + 1 // spotifyAlbum.api.album.total_tracks >= 15 ? 5 : 
-      const freebeeMax: number = Math.ceil(spotifyAlbum.api.album.total_tracks / 10)
+      const totalTracksForPlayThroughs = spotifyAlbum.custom?.discs > 0 ? spotifyAlbum.api.album.total_tracks / spotifyAlbum.custom.discs : spotifyAlbum.api.album.total_tracks
+      const albumDistinctTracksListenQualifier: number = Math.ceil(totalTracksForPlayThroughs * 0.65) // Math.ceil(totalTracksForPlayThroughs / 2) + 1 // totalTracksForPlayThroughs >= 15 ? 5 : 
+      const freebeeMax: number = Math.ceil(totalTracksForPlayThroughs / 10)
       let scrobbleIndex: number = 0, 
           distinctTracksList: { title: string, timestamp: number }[] = [], 
           distinctTracksListFinal: { title: string, timestamp: number }[] = [], 

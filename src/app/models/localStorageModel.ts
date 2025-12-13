@@ -20,12 +20,14 @@ export class SpotifyAlbumEntryModel {
 
 export class SpotifyCustomAlbumPropModel {
     duration: number
+    discs: number
     lastfmLastListened: number
     lastfmScrobbles: number
     fullPlayThroughs: number
 
     constructor() {
         this.duration = 0
+        this.discs = 0
         this.lastfmLastListened = null
         this.lastfmScrobbles = null
         this.fullPlayThroughs = null
