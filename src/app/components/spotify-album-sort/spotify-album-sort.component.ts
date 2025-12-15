@@ -197,7 +197,7 @@ export class SpotifyAlbumSortComponent implements AfterViewInit {
       case "Scrobbles": return !entry.custom.lastfmScrobbles ? "Unknown" : entry.custom.lastfmScrobbles.toLocaleString()
       case "Playthroughs": return !entry.custom.fullPlayThroughs ? "Never / Unknown" : `${entry.custom.fullPlayThroughs}`
       case "Suggested": return !entry.custom.lastfmLastListened ? "Unknown" : `<i class="fas fa-star"></i> ${calculateSuggestedScore(entry).toFixed(1)} • <i class="fas fa-clock"></i> ${moment.unix(entry.custom.lastfmLastListened).fromNow()} • <i class="fas fa-play"></i> ${entry.custom.lastfmScrobbles.toLocaleString()}`
-      case "Time b/w Plays": return !entry.custom.averageTimeBetweenPlays ? "Unknown" : this.humanizeDurationToHours(Math.abs(entry.custom.averageTimeBetweenPlays))
+      case "Time b/w Plays": return !entry.custom.averageTimeBetweenPlays ? "Not Enough Data / Unknown" : this.humanizeDurationToHours(Math.abs(entry.custom.averageTimeBetweenPlays))
       default: return moment(entry.api.added_at).format("MM-DD-yyyy hh:mm A")
     }
   }

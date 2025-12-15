@@ -47,7 +47,7 @@ export class LocalStorageService {
         .filter(x => x != 0)
         .sort((a, b) => a - b)
 
-      const averageTimeBetweenAlbumPlays: number = timeDifferences.length
+      const averageTimeBetweenAlbumPlays: number = timeDifferences.length >= 1 // 3 play throughs
         ? timeDifferences.reduce((sum, v) => sum + v, 0) / timeDifferences.length
         : 0;
       album.custom.averageTimeBetweenPlays = averageTimeBetweenAlbumPlays;
