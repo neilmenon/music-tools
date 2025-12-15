@@ -117,9 +117,12 @@ export class SpotifyService {
       customProperties.duration = x.album.tracks.items.map(x => x.duration_ms).reduce((a, b) => a + b, 0)
       customProperties.discs = new Set(tracks.map(t => t.disc_number)).size
 
-      // get total tracks to be considered as an album play. (e.g. strip instrumental tracks if not an instrumental album)
+      // get total tracks to be considered as an album play. (e.g. )
       // ex this type of album: https://open.spotify.com/album/4nrWWmcF5QbROgZ7YitJ2q
-      customProperties.adjustedFullPlayTracks = !x.album.name.toLowerCase().includes("instrumental") ? 
+      customProperties.adjustedFullPlayTracks = ( // strip instrumental tracks if not an instrumental album
+        !x.album.name.toLowerCase().includes("instrumental") &&
+        !tracks.every(t => t.name.toLowerCase().includes("instrumental"))
+      ) ? 
         tracks.filter(t => !t.name.toLowerCase().includes("instrumental")).length :
         tracks.length;
 
