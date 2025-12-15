@@ -47,12 +47,10 @@ export class LocalStorageService {
         .filter(x => x != 0)
         .sort((a, b) => a - b)
 
-      const medianTimeBetweenAlbumPlays: number = timeDifferences.length >= 1 ?
-        timeDifferences.length % 2 === 0
-          ? (timeDifferences[timeDifferences.length / 2 - 1] + timeDifferences[timeDifferences.length / 2]) / 2
-          : timeDifferences[Math.floor(timeDifferences.length / 2)]
-        : 0
-      album.custom.averageTimeBetweenPlays = medianTimeBetweenAlbumPlays
+      const averageTimeBetweenAlbumPlays: number = timeDifferences.length
+        ? timeDifferences.reduce((sum, v) => sum + v, 0) / timeDifferences.length
+        : 0;
+      album.custom.averageTimeBetweenPlays = averageTimeBetweenAlbumPlays;
     })
     return albums
   }
