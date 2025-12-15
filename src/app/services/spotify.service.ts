@@ -112,11 +112,16 @@ export class SpotifyService {
         trackResponse = await lastValueFrom(this.http.get<SpotifyApi.AlbumTracksResponse>(trackResponse.next).pipe(delay(500)))
         tracks = [...tracks, ...trackResponse.items]
       }
-
-      customProperties.discs = new Set(tracks.map(t => t.disc_number)).size
-
+      
       // map custom/calculated properties
       customProperties.duration = x.album.tracks.items.map(x => x.duration_ms).reduce((a, b) => a + b, 0)
+      customProperties.discs = new Set(tracks.map(t => t.disc_number)).size
+
+      // get total tracks to be considered as an album play. (e.g. strip instrumental tracks if not an instrumental album)
+      // ex this type of album: https://open.spotify.com/album/4nrWWmcF5QbROgZ7YitJ2q
+      customProperties.adjustedFullPlayTracks = !x.album.name.toLowerCase().includes("instrumental") ? 
+        tracks.filter(t => !t.name.toLowerCase().includes("instrumental")).length :
+        tracks.length;
 
       // preserve last played Last.fm stats (if exist)
       const existingProps = cachedAlbums?.data?.find(y => y?.api?.album?.id == x?.album?.id)?.custom

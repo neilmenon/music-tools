@@ -26,6 +26,7 @@ export class SpotifyCustomAlbumPropModel {
     fullPlayThroughs: number
     averageTimeBetweenPlays: number
     albumPlayTimestamps: number[]
+    adjustedFullPlayTracks: number
 
     constructor() {
         this.duration = 0
@@ -35,6 +36,7 @@ export class SpotifyCustomAlbumPropModel {
         this.fullPlayThroughs = null
         this.averageTimeBetweenPlays = null
         this.albumPlayTimestamps = []
+        this.adjustedFullPlayTracks = 0
     }
 }
 
