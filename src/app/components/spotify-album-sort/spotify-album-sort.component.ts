@@ -210,7 +210,7 @@ export class SpotifyAlbumSortComponent implements AfterViewInit {
       case "Playthroughs": return !this.lastfmLastFetched && this.lastfmUsername ? `Not seeing your Last.fm data? Use the fetch button to perform the initial fetch.` : "Number of times you've listened to this album all the way through." 
       case "Suggested": return !this.lastfmLastFetched && this.lastfmUsername ? `Not seeing your Last.fm data? Use the fetch button to perform the initial fetch.` : "Gives a score that is a healthy balance between your <u>most played</u> albums and <u>albums you haven't listened to in a while</u>. The <u>higher</u> the score, the more suggested the album is."
       // case "Anniversary": return "Shows when the next anniversary for the album is, so you can listen on that day!"
-      case "Time b/w Plays": return !this.lastfmLastFetched && this.lastfmUsername ? `Not seeing your Last.fm data? Use the fetch button to perform the initial fetch.` : "The median time between your full plays of this album. One of the few stats that indicates your favorites without relying on play counts!"
+      case "Time b/w Plays": return !this.lastfmLastFetched && this.lastfmUsername ? `Not seeing your Last.fm data? Use the fetch button to perform the initial fetch.` : "The average time between your full plays of this album. One of the few stats that indicates your favorites without relying on play counts!"
       default: return ""
     }
   }
