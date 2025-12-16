@@ -85,7 +85,7 @@ export type SortOrder = "asc" | "desc"
 
 export function calculateSuggestedScore(album: SpotifyAlbumEntryModel): number {
   // Suggested Score = w1 * Days Since Last Listened + w2 * log(Number of Listens)
-  const w1: number = 0.5, w2: number = 0.5
+  const w1: number = 0.7, w2: number = 0.3
   const daysSinceLastListened: number = Math.abs(moment().diff(moment.unix(album.custom.lastfmLastListened), 'days'))
   const numberOfListens: number = album.custom.lastfmScrobbles ? album.custom.lastfmScrobbles : 0
 

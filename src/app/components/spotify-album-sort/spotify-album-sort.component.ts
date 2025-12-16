@@ -50,6 +50,8 @@ export class SpotifyAlbumSortComponent implements AfterViewInit {
   lastfmFetchProgress: number = 0
   fetchFrequencies = FETCH_FREQUENCIES
   spotifyFetchProgress: number = 0
+  albumPlayTimestampsMap: { timestamp: number, albumId: string }[] = []
+  showTimelineView: boolean = false
 
   constructor(
     private localStorageService: LocalStorageService,
@@ -85,17 +87,21 @@ export class SpotifyAlbumSortComponent implements AfterViewInit {
     this.lastfmLastFetched = this.localStorageService.getSpotifySavedAlbums()?.lastfmLastScanned ? moment.unix(this.localStorageService.getSpotifySavedAlbums().lastfmLastScanned) : null
     this.nextLastfmFetchDate = this.lastfmLastFetched ? moment(this.lastfmLastFetched).add(this.fetchFrequencies.lastfm.value, this.fetchFrequencies.lastfm.unit as any) : null
     this.albums = this.albumsInitial
-
+    
     this.filterControl.valueChanges.pipe(debounceTime(200), distinctUntilChanged()).subscribe(() => {
       this.albums = this.filterControl.value?.trim()?.length ? 
-        this.albumsInitial.filter(x => 
-          `${ x.api.album.name } ${ this.formatArtists(x.api.album.artists) }`.toLowerCase().includes(this.filterControl.value.toLowerCase()) ||
-          this.filterControl.value === x.api.album.id
-        ) : 
-        this.albumsInitial
+      this.albumsInitial.filter(x => 
+        `${ x.api.album.name } ${ this.formatArtists(x.api.album.artists) }`.toLowerCase().includes(this.filterControl.value.toLowerCase()) ||
+        this.filterControl.value === x.api.album.id
+      ) : 
+      this.albumsInitial
     })
-
+    
     this.sortPref = this.localStorageService.getUserPreferences().spotifySort
+
+    this.albumPlayTimestampsMap = this.albumsInitial.flatMap(album => album.custom.albumPlayTimestamps.map(timestamp => ({ timestamp: timestamp, albumId: album.api.album.id })))
+      .sort((a, b) => this.sortPref.sortDesc ? b.timestamp - a.timestamp : a.timestamp - b.timestamp);
+
     this.lastfmUsername = this.localStorageService.getLastfmUsername()
     this.lastfmService.fetchProgress.subscribe(value => this.lastfmFetchProgress = value)
     this.spotifyService.fetchProgress.subscribe(value => this.spotifyFetchProgress = value)
@@ -123,6 +129,10 @@ export class SpotifyAlbumSortComponent implements AfterViewInit {
 
   getFetchLastfmTooltip(): string {
     return this.canRefetchLastfmData ? `Re-fetch Last.fm data now! This can be done every ${this.fetchFrequencies.lastfm.value} ${this.fetchFrequencies.lastfm.unit}. Last fetched: ${this.lastfmLastFetched ? `${this.lastfmLastFetched.format()} - ${this.lastfmLastFetched.locale('en-US')?.fromNow()}` : 'never'}` : `You may refetch your Last.fm data every ${this.fetchFrequencies.lastfm.value} ${this.fetchFrequencies.lastfm.unit}. Next fetch avaiable ${this.nextLastfmFetchDate ? 'in ' + moment.duration(this.nextLastfmFetchDate.diff(moment())).locale('en-US').humanize(): 'now'}.`
+  }
+
+  getSpotifyAlbumById(id: string): SpotifyAlbumEntryModel {
+    return this.albumsInitial.find(x => x.api.album.id == id)
   }
 
   async fetchData() {
@@ -197,7 +207,7 @@ export class SpotifyAlbumSortComponent implements AfterViewInit {
       case "Scrobbles": return !entry.custom.lastfmScrobbles ? "Unknown" : entry.custom.lastfmScrobbles.toLocaleString()
       case "Playthroughs": return !entry.custom.fullPlayThroughs ? "Never / Unknown" : `${entry.custom.fullPlayThroughs}`
       case "Suggested": return !entry.custom.lastfmLastListened ? "Unknown" : `<i class="fas fa-star"></i> ${calculateSuggestedScore(entry).toFixed(1)} • <i class="fas fa-clock"></i> ${moment.unix(entry.custom.lastfmLastListened).fromNow()} • <i class="fas fa-play"></i> ${entry.custom.lastfmScrobbles.toLocaleString()}`
-      case "Time b/w Plays": return !entry.custom.averageTimeBetweenPlays ? "Not Enough Data / Unknown" : this.humanizeDurationToHours(Math.abs(entry.custom.averageTimeBetweenPlays))
+      case "Time b/w Plays": return !entry.custom.averageTimeBetweenPlays ? "Not Enough Data" : this.humanizeDurationToHours(Math.abs(entry.custom.averageTimeBetweenPlays))
       default: return moment(entry.api.added_at).format("MM-DD-yyyy hh:mm A")
     }
   }
@@ -210,7 +220,7 @@ export class SpotifyAlbumSortComponent implements AfterViewInit {
       case "Playthroughs": return !this.lastfmLastFetched && this.lastfmUsername ? `Not seeing your Last.fm data? Use the fetch button to perform the initial fetch.` : "Number of times you've listened to this album all the way through." 
       case "Suggested": return !this.lastfmLastFetched && this.lastfmUsername ? `Not seeing your Last.fm data? Use the fetch button to perform the initial fetch.` : "Gives a score that is a healthy balance between your <u>most played</u> albums and <u>albums you haven't listened to in a while</u>. The <u>higher</u> the score, the more suggested the album is."
       // case "Anniversary": return "Shows when the next anniversary for the album is, so you can listen on that day!"
-      case "Time b/w Plays": return !this.lastfmLastFetched && this.lastfmUsername ? `Not seeing your Last.fm data? Use the fetch button to perform the initial fetch.` : "The average time between your full plays of this album. One of the few stats that indicates your favorites without relying on play counts!"
+      case "Time b/w Plays": return !this.lastfmLastFetched && this.lastfmUsername ? `Not seeing your Last.fm data? Use the fetch button to perform the initial fetch.` : "The average time between your full plays of this album, if you were to listen to the album right now. One of the few stats that indicates your favorites without relying on play counts!"
       default: return ""
     }
   }
@@ -298,6 +308,9 @@ export class SpotifyAlbumSortComponent implements AfterViewInit {
     this.sortPref.sortKey == option ? this.sortPref.sortDesc = !this.sortPref.sortDesc : null
     this.sortPref.sortKey = option
     this.updateUserPref()
+    if (this.sortPref.sortKey === 'Last Played') {
+      this.albumPlayTimestampsMap.sort((a, b) => this.sortPref.sortDesc ? b.timestamp - a.timestamp : a.timestamp - b.timestamp)
+    }
   }
 
   updateUserPref() {
