@@ -45,7 +45,7 @@
             <mat-label><mat-icon>search</mat-icon><i> Filter library&nbsp;•&nbsp;{{ albums.length | pluralize:'item' }}&nbsp;</i></mat-label>
             <a class="clear-filter" (click)="clearFilter()" *ngIf="filterControl.value?.length"><mat-icon>close</mat-icon></a>
         </mat-form-field>
-        <ng-container *ngIf="sortPref.sortKey === 'Last Played'">
+        <!-- <ng-container *ngIf="sortPref.sortKey === 'Last Played'">
             <a (click)="showTimelineView = !showTimelineView" class="action-link clickable" style="margin-bottom: 0.5rem;display:block"><i class="fas fa-toggle-{{ showTimelineView ? 'on': 'off' }}"></i> Show as Timeline</a>
             <div *ngIf="showTimelineView" [ngClass]="!mobileView() ? 'album-container' : 'album-container-mobile'" title="{{ sortPref.sortKey }}-container">
                 <a *ngFor="let timestampMap of albumPlayTimestampsMap" [ngClass]="!mobileView() ? 'album-card' : 'album-card-mobile'" (click)="openAlbumDialog(getSpotifyAlbumById(timestampMap.albumId))" target="_blank" style="cursor: pointer;">
@@ -57,7 +57,7 @@
                     </div>
                 </a>
             </div>
-        </ng-container>
+        </ng-container> -->
         <table style="width: 100%" *ngIf="sortPref.listView">
             <thead class="sticky-table-header">
                 <tr>
