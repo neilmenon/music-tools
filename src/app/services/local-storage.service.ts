@@ -38,7 +38,7 @@ export class LocalStorageService {
 
   getSpotifySavedAlbums(): SpotifyLocalAlbumModel {
     const albums: SpotifyLocalAlbumModel = JSON.parse(localStorage.getItem(SPOTIFY_ALBUM_LOCAL))
-    albums.data.forEach(album => {
+    albums?.data.forEach(album => {
       // populate median time between plays (unbiased by play count)
       const albumPlayTimestamps: number[] = album.custom.albumPlayTimestamps ?? []
 
