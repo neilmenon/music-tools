@@ -41,7 +41,7 @@ def fetch_spotify_library(spotify: spotipy.Spotify, users_local_date: datetime.d
     except Exception as e:
         message = "An error occurred while trying to fetch your Spotify library. Error: {}".format(e)
         # print(message)
-        raise Exception(message)
+        # raise Exception(message)
         errors.append({ "date": str(users_local_date), "message": message })
         return { "mapped": None, "errors": errors }
 

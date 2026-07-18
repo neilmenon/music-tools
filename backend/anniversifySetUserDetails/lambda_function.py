@@ -142,8 +142,9 @@ def lambda_handler(event, context):
         new_spotify_auth = [body['SpotifyAuth']]
         body['UserDetails']['registerDate'] = str(datetime.now().astimezone(tz=pytz.timezone(body['UserDetails']['timezone'])))
     elif not is_create and body['SpotifyAuth']:
-        SpotifyAuth.append(body['SpotifyAuth'])
-        new_spotify_auth = SpotifyAuth
+        # SpotifyAuth.append(body['SpotifyAuth'])
+        # new_spotify_auth = SpotifyAuth
+        new_spotify_auth = [body['SpotifyAuth']]
     else:
         new_spotify_auth = SpotifyAuth
         
@@ -191,7 +192,7 @@ def lambda_handler(event, context):
         print(email_response)
     
     # send push notification confirmation upon enable
-    if not UserDetails.get('pushNotificationObject', False) and body['UserDetails'].get('pushNotificationObject', False):
+    if UserDetails and not UserDetails.get('pushNotificationObject', False) and body['UserDetails'].get('pushNotificationObject', False):
         welcome_notification_text = "Rediscover albums in your library and celebrate their milestones with Anniversify! ➡️ Consider updating/decluttering your Spotify Library to get the most out of your notifications — you'll receive at most one per day."
         payload = {
             "notification": {

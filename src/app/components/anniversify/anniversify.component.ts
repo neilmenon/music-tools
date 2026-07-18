@@ -10,6 +10,7 @@ import * as moment from 'moment';
 import { config } from '../../config/config';
 import { SwPush } from '@angular/service-worker';
 import { MatSlideToggleChange } from '@angular/material/slide-toggle';
+import { SpotifyService } from 'src/app/services/spotify.service';
 
 @Component({
   selector: 'app-anniversify',
@@ -33,6 +34,7 @@ export class AnniversifyComponent implements OnInit {
   constructor(
     private localStorageService: LocalStorageService,
     private anniversifyService: AnniversifyService,
+    private spotifyService: SpotifyService,
     private fb: UntypedFormBuilder,
     private messageService: MessageService,
     private swPush: SwPush
@@ -41,6 +43,8 @@ export class AnniversifyComponent implements OnInit {
   }
   
   ngOnInit(): void {
+    // make a call to Spotify, which if fails, will ensure the token gets refreshed
+    this.spotifyService.getSpotifyUserDetails();
     this.createForm()
     this.anniversifyForm.valueChanges.pipe(debounceTime(50), distinctUntilChanged()).subscribe(() => {
       console.log(this.anniversifyForm.getRawValue())
@@ -79,6 +83,7 @@ export class AnniversifyComponent implements OnInit {
     if (this.anniversifyForm.valid) {
       this.loadingUpdate = true
       let payload: AnniversifyModel = JSON.parse(JSON.stringify(this.anniversifyForm.getRawValue()))
+      payload.errors = [];
       this.anniversifyService.setDetails(payload, this.anniversifyDetails ? false : true).then(data => {
         this.anniversifyDetails = JSON.parse(JSON.stringify(data))
         this.loadingUpdate = false

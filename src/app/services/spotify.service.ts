@@ -28,11 +28,11 @@ export class SpotifyService {
     return this.localStorageService.getSpotifyAuthDetails() ? true : false
   }
 
-  redirectToAuthorizationPage(tool: MusicTool) {
+  redirectToAuthorizationPage(tool?: MusicTool) {
     let authParameters = {
       client_id: config.spotify.clientId,
       response_type: "code",
-      redirect_uri: `${ config.spotify.redirectUri }/${ tool }`,
+      redirect_uri: `${ config.spotify.redirectUri }${ tool ? `/${ tool }` : `` }`,
       scope: config.spotify.scopes[tool]
     }
 
@@ -77,6 +77,13 @@ export class SpotifyService {
     let refreshResponse: SpotifyApiTokenModel = await lastValueFrom(
       this.http.post<SpotifyApiTokenModel>(config.spotify.authCodeUrl, data).pipe(
         catchError((err: HttpErrorResponse) => {
+          if (err?.error?.error === 'invalid_grant') {
+            this.messageService.open("Spotify refresh token has expired. Please re-authenticate.")
+            this.localStorageService.clearSpotifyAuthData()
+            const tool: MusicTool | undefined = window.location.href.includes("spotify-album-sort") ? "spotify-album-sort" : 
+              window.location.href.includes("anniversify") ? "anniversify" : undefined;
+            this.redirectToAuthorizationPage(tool);
+          }
           this.messageService.open("Error refreshing Spotify auth token." + this.errorService.getHttpErrorMessage(err))
           return throwError(() => err)
         })

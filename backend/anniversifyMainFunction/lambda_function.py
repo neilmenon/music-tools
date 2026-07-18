@@ -11,6 +11,20 @@ import base64
 import time
 from pywebpush import webpush, WebPushException
 
+reauth_required_text = "<br><br><strong>Due to new Spotify API restrictions which limit token grants to 6 months, your Spotify integration with Anniversify requires reauthentication. Playlist updates and syncing your library with Spotify have stopped working. To fix this, simply visit Anniversify by clicking the link at the bottom of this email, navigate to Anniversify, and hit Update Settings to continue using the app.</strong>"
+
+def chunked(iterable, n):
+    """Yield successive n-sized chunks from iterable."""
+    for i in range(0, len(iterable), n):
+        yield iterable[i:i+n]
+
+def get_has_refresh_token_expired(user_details) -> bool:
+    if user_details.get('errors'):
+        for error in user_details['errors']:
+            if "invalid_grant" in error['message'] or "401" in error['message']:
+                return True
+    return False
+
 def replace_template_variables(replacements: dict, template: str) -> str:
     # in the replacements being done, the key is surrounded like {{key}}
     for variable, replacement in replacements.items():
@@ -35,12 +49,15 @@ def build_and_send_email(anniversaries: list, users_local_date: datetime.datetim
         }
         album_box_html += replace_template_variables(replacements, release_template_html)
 
+    has_refresh_token_expired = get_has_refresh_token_expired(user_details)
+    errors_prefix = "[Reauthentication required] " if has_refresh_token_expired else ""
+
     # set replacements for main email template
-    subject = "Your anniversaries for {}".format(users_local_date.strftime("%m-%d-%Y"))
+    subject = "{}Your anniversaries for {}".format(errors_prefix, users_local_date.strftime("%m-%d-%Y"))
     template_data = {
         "subject": subject,
         "spotifyUserName": user_details['name'],
-        "tipAboutAlbumArt": os.environ['EMAIL_TEMPLATE_TIP_HTML'],
+        "tipAboutAlbumArt": reauth_required_text if has_refresh_token_expired else os.environ['EMAIL_TEMPLATE_TIP_HTML'],
         "numberOfReleases": "1 release" if len(anniversaries) == 1 else "{} releases".format(len(anniversaries)),
         "todaysDate": users_local_date.strftime("%B %-d"),
         "spotifyPlaylistId": user_details['spotifyPlaylistId'],
@@ -110,9 +127,18 @@ def add_anniversaries_to_playlist(spotify: spotipy.Spotify, albums: list, users_
             print("\t Fetched {} track(s).".format(len(album_track_ids)))
             track_ids.extend(album_track_ids)
         
-        print("Replacing playlist tracks with {} tracks(s) from {} album(s)...".format(len(track_ids), len(albums)))
-        spotify.playlist_replace_items(spotify_playlist_id, track_ids)
-        print("Replaced.")
+        if len(track_ids):
+            chunks = list(chunked(track_ids, 100))
+            print("Replacing playlist tracks with {} tracks(s) from {} album(s) in {} 100/each chunk(s)...".format(len(track_ids), len(albums), len(chunks)))
+
+            # replace playlist with the first 100
+            spotify.playlist_replace_items(spotify_playlist_id, chunks[0])
+
+            # add the remaining tracks
+            if len(chunks) > 1:
+                for chunk in chunks[1:]:
+                    spotify.playlist_add_items(spotify_playlist_id, chunk)
+        print("Replaced old tracks.")
     except Exception as e:
         message = "An error occurred while trying to update the Spotify playlist. Skipping playlist update. Error: {}".format(e)
         print(message)
@@ -143,6 +169,21 @@ def find_anniversaries(albums: list, users_local_date: datetime.datetime):
                 anniversary_albums.append(a)
     
     return anniversary_albums
+
+def format_artists(album_anniversaries):
+    names = [a['artist'] for a in album_anniversaries]
+    count = len(names)
+
+    if count == 0:
+        return ""
+    elif count == 1:
+        return names[0]
+    elif count == 2:
+        return f"{names[0]} and {names[1]}"
+    elif count <= 4:
+        return ", ".join(names[:-1]) + f", and {names[-1]}"
+    else:
+        return ", ".join(names[:3]) + f", and {count - 3} more"
 
 def lambda_handler(event, context):
     print(event)
@@ -223,10 +264,12 @@ def lambda_handler(event, context):
             print("Sending email to {} with {} release(s)...".format(user_details['email'], len(album_anniversaries)))
             build_and_send_email(album_anniversaries, users_local_date, user_details)
         if user_details.get('pushNotificationObject', False):
+            has_refresh_token_expired = get_has_refresh_token_expired(user_details)
+            errors_prefix = "[Reauthentication required] " if has_refresh_token_expired else ""
             payload = {
                 "notification": {
                     "title": "Anniversify",
-                    "body": "{} from your Spotify Library came out today, {}. Tap to view 🎉".format("1 release" if len(album_anniversaries) == 1 else "{} releases".format(len(album_anniversaries)), users_local_date.strftime("%B %-d")),
+                    "body": "{}{} today from {}! Celebrate with a listen.".format(errors_prefix, "Anniversary" if len(album_anniversaries) == 1 else "Anniversaries", format_artists(album_anniversaries)),
                     "data": {
                         "onActionClick": {
                             "default": {"operation": "openWindow", "url": "/anniversify/report/{}/{}/{}".format(users_local_date.strftime("%m-%d-%Y"), len(album_anniversaries), user_details['spotifyPlaylistId'])}

@@ -73,6 +73,11 @@ export class LocalStorageService {
     this.messageService.open("Disconnected your Spotify account and cleared local data.")
   }
 
+  async clearSpotifyAuthData() {
+    localStorage.removeItem(SPOTIFY_AUTH_LOCAL)
+    localStorage.removeItem(ANNIVERSIFY_DEVICE_TOKENS_SENT)
+  }
+
   getUserPreferences(): UserPreferenceModel {
     return JSON.parse(localStorage.getItem(USER_PREF_LOCAL)) ? JSON.parse(localStorage.getItem(USER_PREF_LOCAL)) : this.setUserPreferences(new UserPreferenceModel)
   }

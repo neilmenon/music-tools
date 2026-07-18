@@ -22,11 +22,11 @@ export class AnniversifyService {
   async setDetails(details: AnniversifyModel, isCreate: boolean): Promise<AnniversifyModel> {
     let payload: any = { 
       "UserDetails": JSON.parse(JSON.stringify(details)),
-      'SpotifyAuth': null
+      'SpotifyAuth': JSON.parse(JSON.stringify(this.localStorageService.getSpotifyAuthDetails()?.data))
     }
-    if (!this.localStorageService.getAnniversifyDeviceTokensSent()) {
-      payload['SpotifyAuth'] = JSON.parse(JSON.stringify(this.localStorageService.getSpotifyAuthDetails()?.data))
-    }
+    // if (!this.localStorageService.getAnniversifyDeviceTokensSent() || details?.errors?.length) {
+    //   payload['SpotifyAuth'] = JSON.parse(JSON.stringify(this.localStorageService.getSpotifyAuthDetails()?.data))
+    // }
     
     let response;
     if (isCreate) {

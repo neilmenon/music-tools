@@ -49,7 +49,7 @@
             <a (click)="showTimelineView = !showTimelineView" class="action-link clickable" style="margin-bottom: 0.5rem;display:block"><i class="fas fa-toggle-{{ showTimelineView ? 'on': 'off' }}"></i> Show as Timeline</a>
             <div *ngIf="showTimelineView" [ngClass]="!mobileView() ? 'album-container' : 'album-container-mobile'" title="{{ sortPref.sortKey }}-container">
                 <a *ngFor="let timestampMap of albumPlayTimestampsMap" [ngClass]="!mobileView() ? 'album-card' : 'album-card-mobile'" (click)="openAlbumDialog(getSpotifyAlbumById(timestampMap.albumId))" target="_blank" style="cursor: pointer;">
-                    <img src="{{ extractAlbumImage(getSpotifyAlbumById(timestampMap.albumId).api.album.images) }}">
+                    <div></div>
                     <div class="text-ellipsis">
                         <div class="text-ellipsis" matTooltip="{{ getSpotifyAlbumById(timestampMap.albumId).api.album.name }}" matTooltipPosition="above"><strong>{{ getSpotifyAlbumById(timestampMap.albumId).api.album.name }}</strong></div>
                         <span>{{ formatArtists(getSpotifyAlbumById(timestampMap.albumId).api.album.artists) }}</span><br>
